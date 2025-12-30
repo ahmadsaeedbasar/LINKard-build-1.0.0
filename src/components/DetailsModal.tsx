@@ -34,7 +34,10 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
     }
   };
 
-  const formatPrice = (price: string) => {
+  const formatPrice = (price: string | null | undefined) => {
+    if (price === null || price === undefined || price.trim() === '') {
+      return 'N/A';
+    }
     const num = parseFloat(price.replace(/[^0-9.-]+/g,""));
     if (isNaN(num)) return price;
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);

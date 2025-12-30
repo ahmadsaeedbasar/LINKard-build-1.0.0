@@ -13,7 +13,7 @@ export interface Profile {
   category: string;
   location: string;
   followers_count: string;
-  start_price: string;
+  start_price: string | null; // Changed to allow null
   platform: string;
   platform_label: string;
   platform_color_class: string;
