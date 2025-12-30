@@ -13,19 +13,32 @@ import {
   TrendingUp, 
   ArrowUpRight, 
   Settings, 
-  Eye 
+  Eye,
+  Briefcase
 } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, profile } = useAuth();
-  const { inquiries } = useInquiries();
+  const { receivedInquiries, sentInquiries } = useInquiries();
+  
+  const isInfluencer = profile?.role === 'influencer';
+  const inquiries = isInfluencer ? receivedInquiries : sentInquiries;
 
-  const stats = [
-    { label: 'Total Reach', value: '45.2k', icon: Users, change: '+12%', color: 'text-blue-600' },
+  const creatorStats = [
+    { label: 'Total Reach', value: profile?.followers_count || '0', icon: Users, change: '+12%', color: 'text-blue-600' },
     { label: 'Avg. Engagement', value: '5.8%', icon: TrendingUp, change: '+0.4%', color: 'text-emerald-600' },
     { label: 'Profile Views', value: '1,284', icon: Eye, change: '+18%', color: 'text-purple-600' },
-    { label: 'New Inquiries', value: inquiries.length.toString(), icon: MessageSquare, change: `${inquiries.filter(i => i.status === 'new').length} new`, color: 'text-orange-600' },
+    { label: 'New Inquiries', value: receivedInquiries.length.toString(), icon: MessageSquare, change: `${receivedInquiries.filter(i => i.status === 'new').length} new`, color: 'text-orange-600' },
   ];
+
+  const clientStats = [
+    { label: 'Sent Requests', value: sentInquiries.length.toString(), icon: Briefcase, change: 'Active', color: 'text-blue-600' },
+    { label: 'Budget Spent', value: '$0', icon: TrendingUp, change: 'Pending', color: 'text-emerald-600' },
+    { label: 'Response Rate', value: '100%', icon: Eye, change: 'Optimal', color: 'text-purple-600' },
+    { label: 'Active Projects', value: '0', icon: MessageSquare, change: 'New', color: 'text-orange-600' },
+  ];
+
+  const stats = isInfluencer ? creatorStats : clientStats;
 
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-50 text-gray-900">
@@ -34,16 +47,22 @@ const Dashboard = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
             <h1 className="text-3xl font-bold">Welcome back, {profile?.display_name || user?.email}!</h1>
-            <p className="text-gray-500">Here's what's happening with your profile today.</p>
+            <p className="text-gray-500">
+              {isInfluencer 
+                ? "Here's what's happening with your creator profile today." 
+                : "Manage your influencer collaborations and inquiries."}
+            </p>
           </div>
           <div className="flex gap-3">
-            <Link to="/analytics" className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
-              <BarChart3 className="w-4 h-4" />
-              View Analytics
-            </Link>
+            {isInfluencer && (
+              <Link to="/analytics" className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+                <BarChart3 className="w-4 h-4" />
+                View Analytics
+              </Link>
+            )}
             <Link to="/settings/profile" className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors">
               <Settings className="w-4 h-4" />
-              Edit Profile
+              Settings
             </Link>
           </div>
         </div>
@@ -69,7 +88,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-xl font-bold">Recent Inquiries</h2>
+              <h2 className="text-xl font-bold">{isInfluencer ? 'Received Inquiries' : 'Your Sent Inquiries'}</h2>
             </div>
             <div className="divide-y divide-gray-50">
               {inquiries.length > 0 ? inquiries.map((inquiry) => (
@@ -98,7 +117,14 @@ const Dashboard = () => {
               )) : (
                 <div className="p-12 text-center text-gray-400">
                   <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                  <p>No inquiries yet. Keep sharing your profile!</p>
+                  <p>
+                    {isInfluencer 
+                      ? "No inquiries yet. Keep sharing your profile!" 
+                      : "You haven't sent any inquiries to creators yet."}
+                  </p>
+                  {!isInfluencer && (
+                    <Link to="/search" className="inline-block mt-4 text-black font-bold underline">Browse Creators</Link>
+                  )}
                 </div>
               )}
             </div>
@@ -107,12 +133,19 @@ const Dashboard = () => {
           <div className="space-y-6">
             <div className="bg-black text-white p-8 rounded-3xl shadow-lg relative overflow-hidden">
               <div className="relative z-10">
-                <h3 className="text-xl font-bold mb-2">Grow your reach</h3>
+                <h3 className="text-xl font-bold mb-2">
+                  {isInfluencer ? "Grow your reach" : "Discover New Talent"}
+                </h3>
                 <p className="text-gray-400 text-sm mb-4">
-                  Updating your pricing and ad slots can increase your visibility to brands by up to 40%.
+                  {isInfluencer 
+                    ? "Updating your pricing and ad slots can increase your visibility to brands by up to 40%."
+                    : "Use our advanced search to find the perfect influencers for your next campaign."}
                 </p>
-                <Link to="/settings/profile" className="block w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-100 transition-colors text-center">
-                  Update Slots
+                <Link 
+                  to={isInfluencer ? "/settings/profile" : "/search"} 
+                  className="block w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-100 transition-colors text-center"
+                >
+                  {isInfluencer ? "Update Slots" : "Find Creators"}
                 </Link>
               </div>
             </div>

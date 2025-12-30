@@ -1,28 +1,64 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
-import { showSuccess } from '@/utils/toast';
-import { Save, ChevronLeft } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { showSuccess, showError } from '@/utils/toast';
+import { Save, ChevronLeft, Loader2 } from 'lucide-react';
 
 const EditProfile = () => {
   const { user, profile } = useAuth();
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState(false);
+  
   const [formData, setFormData] = useState({
-    displayName: profile?.display_name || user?.user_metadata?.display_name || '',
-    bio: profile?.bio || 'Professional creator specializing in authentic content storytelling.',
-    category: profile?.category || 'Lifestyle',
-    location: profile?.location || 'United States',
-    startPrice: profile?.start_price || '$350',
+    displayName: '',
+    bio: '',
+    category: 'Lifestyle',
+    location: '',
+    startPrice: '',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (profile) {
+      setFormData({
+        displayName: profile.display_name || '',
+        bio: profile.bio || '',
+        category: profile.category || 'Lifestyle',
+        location: profile.location || '',
+        startPrice: profile.start_price || '',
+      });
+    }
+  }, [profile]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    showSuccess("Profile updated successfully!");
-    navigate('/dashboard');
+    if (!user) return;
+    
+    setIsSaving(true);
+    const { error } = await supabase
+      .from('profiles')
+      .update({
+        display_name: formData.displayName,
+        bio: formData.bio,
+        category: formData.category,
+        location: formData.location,
+        start_price: formData.startPrice,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', user.id);
+
+    setIsSaving(false);
+    
+    if (error) {
+      showError(error.message);
+    } else {
+      showSuccess("Profile updated successfully!");
+      navigate('/dashboard');
+    }
   };
 
   return (
@@ -49,6 +85,7 @@ const EditProfile = () => {
                 <label className="block text-sm font-bold text-gray-700 mb-2">Display Name</label>
                 <input
                   type="text"
+                  required
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
                   value={formData.displayName}
                   onChange={(e) => setFormData({...formData, displayName: e.target.value})}
@@ -74,6 +111,7 @@ const EditProfile = () => {
               <label className="block text-sm font-bold text-gray-700 mb-2">Bio</label>
               <textarea
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none h-32 resize-none"
+                placeholder="Tell brands about yourself..."
                 value={formData.bio}
                 onChange={(e) => setFormData({...formData, bio: e.target.value})}
               />
@@ -85,6 +123,7 @@ const EditProfile = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
+                  placeholder="e.g. London, UK"
                   value={formData.location}
                   onChange={(e) => setFormData({...formData, location: e.target.value})}
                 />
@@ -94,6 +133,7 @@ const EditProfile = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
+                  placeholder="e.g. $500"
                   value={formData.startPrice}
                   onChange={(e) => setFormData({...formData, startPrice: e.target.value})}
                 />
@@ -102,10 +142,17 @@ const EditProfile = () => {
 
             <button
               type="submit"
-              className="w-full bg-black text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all shadow-lg"
+              disabled={isSaving}
+              className="w-full bg-black text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-gray-800 transition-all shadow-lg disabled:opacity-50"
             >
-              <Save className="w-5 h-5" />
-              Save Changes
+              {isSaving ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  Save Changes
+                </>
+              )}
             </button>
           </form>
         </div>
