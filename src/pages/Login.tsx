@@ -67,7 +67,7 @@ const Login = () => {
             <div>
               <div className="flex justify-between items-center mb-2">
                 <label htmlFor="login_pass" className="block text-sm font-bold text-gray-700">Password</label>
-                <Link to="/forgot-password" usage="sm" className="text-xs font-bold text-gray-400 hover:text-black transition-colors">
+                <Link to="/forgot-password" title="Forgot Password" className="text-xs font-bold text-gray-400 hover:text-black transition-colors">
                   Forgot Password?
                 </Link>
               </div>
