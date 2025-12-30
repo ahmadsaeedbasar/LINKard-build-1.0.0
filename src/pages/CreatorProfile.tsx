@@ -5,14 +5,22 @@ import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import HireModal from '@/components/HireModal';
-import { featuredProfiles } from '@/data/featuredProfiles';
-import { BadgeCheck, MapPin, Globe, Mail, Instagram, Youtube, Twitter, ExternalLink } from 'lucide-react';
+import PortfolioGallery from '@/components/PortfolioGallery';
+import { useProfileByHandle } from '@/hooks/useProfilesData';
+import { BadgeCheck, MapPin, Globe, Mail, Instagram, Youtube, Twitter, ExternalLink, Loader2 } from 'lucide-react';
 
 const CreatorProfile = () => {
   const { handle } = useParams();
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
-  const decodedHandle = handle?.startsWith('@') ? handle : `@${handle}`;
-  const profile = featuredProfiles.find(p => p.profileLink === decodedHandle);
+  const { data: profile, isLoading } = useProfileByHandle(handle || '');
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <Loader2 className="w-12 h-12 animate-spin text-black" />
+      </div>
+    );
+  }
 
   if (!profile) {
     return (
@@ -35,18 +43,18 @@ const CreatorProfile = () => {
       <Header />
       <main className="flex-grow w-full max-w-5xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="bg-white rounded-3xl border border-gray-200 overflow-hidden shadow-sm mb-8">
-          <div className={`h-32 md:h-48 ${profile.platformColorClass} opacity-80`}></div>
+          <div className={`h-32 md:h-48 ${profile.platform_color_class || 'bg-black'} opacity-80`}></div>
           <div className="px-6 pb-8 relative">
             <div className="flex flex-col md:flex-row md:items-end -mt-12 md:-mt-16 gap-4 mb-6">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white bg-white overflow-hidden shadow-md">
-                <img src={profile.profileImage} alt={profile.name} className="w-full h-full object-cover" />
+                <img src={profile.avatar_url || '/placeholder.svg'} alt={profile.display_name} className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 md:mb-2">
                 <div className="flex items-center gap-2">
-                  <h1 className="text-2xl md:text-3xl font-bold">{profile.name}</h1>
-                  {profile.isVerified && <BadgeCheck className="w-6 h-6 text-blue-500" />}
+                  <h1 className="text-2xl md:text-3xl font-bold">{profile.display_name}</h1>
+                  {profile.is_verified && <BadgeCheck className="w-6 h-6 text-blue-500" />}
                 </div>
-                <p className="text-gray-500 font-medium">{profile.profileLink}</p>
+                <p className="text-gray-500 font-medium">@{profile.username}</p>
               </div>
               <div className="flex gap-2 md:mb-2">
                 <button 
@@ -61,15 +69,15 @@ const CreatorProfile = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-gray-100">
               <div className="flex items-center gap-2 text-gray-600">
                 <MapPin className="w-5 h-5 text-gray-400" />
-                <span className="font-medium">{profile.location}</span>
+                <span className="font-medium">{profile.location || 'Global'}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <Globe className="w-5 h-5 text-gray-400" />
-                <span className="font-medium">{profile.category}</span>
+                <span className="font-medium">{profile.category || 'Creator'}</span>
               </div>
               <div className="flex items-center gap-2 text-gray-600">
                 <Mail className="w-5 h-5 text-gray-400" />
-                <span className="font-medium">Active & Response Ready</span>
+                <span className="font-medium">Vetted Professional</span>
               </div>
             </div>
           </div>
@@ -80,21 +88,21 @@ const CreatorProfile = () => {
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm">
               <h2 className="text-xl font-bold mb-4">About</h2>
               <p className="text-gray-600 leading-relaxed text-lg">
-                Professional {profile.category} creator based in {profile.location}. 
-                Specializing in {profile.contentType} content with a total reach of over {profile.followers} on {profile.platformLabel}.
-                I focus on creating high-quality, authentic content that resonates with my community.
+                {profile.bio || `Professional ${profile.category} creator specializing in high-quality content for their audience.`}
               </p>
             </section>
 
+            <PortfolioGallery items={profile.portfolio_items || []} />
+
             <section className="bg-white p-6 md:p-8 rounded-3xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-bold mb-4">Key Performance Metrics</h2>
+              <h2 className="text-xl font-bold mb-4">Channel Performance</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
-                  <div className="text-3xl font-extrabold text-black">{profile.followers}</div>
+                  <div className="text-3xl font-extrabold text-black">{profile.followers_count || '0'}</div>
                   <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">Total Reach</div>
                 </div>
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
-                  <div className="text-3xl font-extrabold text-black">{profile.startPrice}</div>
+                  <div className="text-3xl font-extrabold text-black">{profile.start_price || 'Quote'}</div>
                   <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">Base Rate</div>
                 </div>
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
@@ -107,19 +115,19 @@ const CreatorProfile = () => {
 
           <div className="space-y-8">
             <section className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-bold mb-4">Verified Channels</h2>
+              <h2 className="text-xl font-bold mb-4">Primary Channels</h2>
               <div className="space-y-3">
-                <a href={profile.socialLink} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all group">
+                <a href={profile.social_link || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-all group">
                   <div className="flex items-center gap-3">
-                    <div className={`p-2.5 rounded-xl ${profile.platformColorClass} text-white shadow-sm`}>
+                    <div className={`p-2.5 rounded-xl ${profile.platform_color_class || 'bg-black'} text-white shadow-sm`}>
                        {profile.platform === 'instagram' && <Instagram size={20} />}
                        {profile.platform === 'youtube' && <Youtube size={20} />}
                        {profile.platform === 'twitter' && <Twitter size={20} />}
                        {!['instagram', 'youtube', 'twitter'].includes(profile.platform) && <ExternalLink size={20} />}
                     </div>
                     <div>
-                      <div className="font-bold">{profile.platformLabel}</div>
-                      <div className="text-xs text-gray-500">Primary Channel</div>
+                      <div className="font-bold capitalize">{profile.platform || 'Platform'}</div>
+                      <div className="text-xs text-gray-500">Verified Channel</div>
                     </div>
                   </div>
                   <ExternalLink size={16} className="text-gray-300 group-hover:text-black transition-colors" />
@@ -128,9 +136,9 @@ const CreatorProfile = () => {
             </section>
 
             <section className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
-              <h2 className="text-xl font-bold mb-4">Available Ad Slots</h2>
+              <h2 className="text-xl font-bold mb-4">Ad Inventory</h2>
               <div className="flex flex-wrap gap-2">
-                {profile.availableSpaces.map((space, i) => (
+                {(profile.available_spaces || ['Post', 'Story']).map((space: string, i: number) => (
                   <span key={i} className="px-4 py-2 bg-gray-100 rounded-xl text-sm font-semibold text-gray-700">
                     {space.replace(/_/g, ' ')}
                   </span>
@@ -146,7 +154,7 @@ const CreatorProfile = () => {
         isOpen={isHireModalOpen} 
         onClose={() => setIsHireModalOpen(false)} 
         creatorId={profile.id}
-        creatorName={profile.name} 
+        creatorName={profile.display_name} 
       />
     </div>
   );

@@ -1,102 +1,101 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import LogoMarquee from '@/components/LogoMarquee';
 import SocialCard from '@/components/SocialCard';
 import DetailsModal from '@/components/DetailsModal';
-import FeaturesSection from '@/components/FeaturesSection';
-import CallToActionSection from '@/components/CallToActionSection';
 import Footer from '@/components/Footer';
-import { featuredProfiles, Profile } from '@/data/featuredProfiles';
-import { showError } from '@/utils/toast';
+import { useProfilesData } from '@/hooks/useProfilesData';
+import { Loader2 } from 'lucide-react';
 
 const Search = () => {
   const [searchParams] = useSearchParams();
-  const initialQuery = searchParams.get('q') || '';
-  const initialPlatformValue = searchParams.get('pf') || '';
+  const query = searchParams.get('q') || '';
+  const platform = searchParams.get('pf') || '';
 
-  const [filteredProfiles, setFilteredProfiles] = useState<Profile[]>([]);
-  const [openModalId, setOpenModalId] = useState<string | null>(null);
+  const { data: profiles, isLoading } = useProfilesData(query, platform);
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
 
-  useEffect(() => {
-    let currentFilteredProfiles = featuredProfiles;
-
-    if (initialQuery) {
-      const lowerCaseQuery = initialQuery.toLowerCase();
-      currentFilteredProfiles = currentFilteredProfiles.filter(
-        (profile) =>
-          profile.category.toLowerCase().includes(lowerCaseQuery) ||
-          profile.name.toLowerCase().includes(lowerCaseQuery)
-      );
-    }
-
-    if (initialPlatformValue) {
-      currentFilteredProfiles = currentFilteredProfiles.filter(
-        (profile) => profile.platform === initialPlatformValue
-      );
-    }
-
-    setFilteredProfiles(currentFilteredProfiles);
-
-    if (initialQuery === '' && initialPlatformValue === '') {
-      showError("Please enter a search term to find influencers.");
-    }
-  }, [initialQuery, initialPlatformValue]);
-
-  const handleOpenDetailsModal = (profileId: string) => {
-    setOpenModalId(profileId);
-  };
-
-  const handleCloseDetailsModal = () => {
-    setOpenModalId(null);
-  };
+  const selectedProfile = profiles?.find(p => p.id === selectedProfileId);
 
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
       <Header />
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative">
-        <HeroSection initialQuery={initialQuery} initialPlatformValue={initialPlatformValue} />
+        <HeroSection initialQuery={query} initialPlatformValue={platform} />
         <LogoMarquee />
 
-        {/* SEARCH RESULTS / FEATURED PROFILES */}
         <section className="py-8 md:py-12">
           <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div className="mb-8">
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
-                {initialQuery || initialPlatformValue ? 'Search Results' : 'Featured Profiles'}
-              </h2>
-              <p className="text-gray-500 mt-1">Verified creators ready for collaboration.</p>
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight">
+                  {query || platform ? 'Search Results' : 'All Influencers'}
+                </h2>
+                <p className="text-gray-500 mt-1">
+                  {isLoading ? 'Searching database...' : `${profiles?.length || 0} creators match your criteria.`}
+                </p>
+              </div>
             </div>
 
-            <div id="creators-scroll" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredProfiles.length > 0 ? (
-                filteredProfiles.map((profile) => (
-                  <SocialCard key={profile.id} profile={profile} onOpenDetails={handleOpenDetailsModal} />
-                ))
-              ) : (
-                <p className="text-gray-600 col-span-full text-center">No profiles found matching your criteria.</p>
-              )}
-            </div>
+            {isLoading ? (
+              <div className="flex justify-center py-20">
+                <Loader2 className="w-10 h-10 animate-spin text-gray-400" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {profiles && profiles.length > 0 ? (
+                  profiles.map((profile) => (
+                    <SocialCard 
+                      key={profile.id} 
+                      profile={{
+                        ...profile,
+                        platformLabel: profile.platform_label,
+                        platformColorClass: profile.platform_color_class,
+                        profileImage: profile.avatar_url || '/placeholder.svg',
+                        isVerified: profile.is_verified,
+                        followers: profile.followers_count,
+                        startPrice: profile.start_price,
+                        availableSpaces: profile.available_spaces || [],
+                        profileLink: `@${profile.username}`,
+                        socialLink: profile.social_link || '#'
+                      }} 
+                      onOpenDetails={(id) => setSelectedProfileId(id)} 
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full py-20 text-center bg-white rounded-3xl border border-dashed border-gray-300">
+                    <p className="text-gray-500 font-medium">No profiles found matching your criteria.</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </section>
-
-        <FeaturesSection />
-        <CallToActionSection />
       </main>
       <Footer />
 
-      {/* Details Modals for all profiles (can be optimized to render only active one) */}
-      {featuredProfiles.map((profile) => (
+      {selectedProfile && (
         <DetailsModal
-          key={profile.id}
-          profile={profile}
-          isOpen={openModalId === profile.id}
-          onClose={handleCloseDetailsModal}
+          profile={{
+            ...selectedProfile,
+            platformLabel: selectedProfile.platform_label,
+            platformColorClass: selectedProfile.platform_color_class,
+            profileImage: selectedProfile.avatar_url || '/placeholder.svg',
+            isVerified: selectedProfile.is_verified,
+            followers: selectedProfile.followers_count,
+            startPrice: selectedProfile.start_price,
+            availableSpaces: selectedProfile.available_spaces || [],
+            profileLink: `@${selectedProfile.username}`,
+            socialLink: selectedProfile.social_link || '#'
+          }}
+          isOpen={!!selectedProfileId}
+          onClose={() => setSelectedProfileId(null)}
         />
-      ))}
+      )}
     </div>
   );
 };
