@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import { X, BadgeCheck, Tag } from 'lucide-react'; // Added Tag icon
-import { Profile } from '@/types/profile'; // Updated import
+import { X, BadgeCheck, Tag } from 'lucide-react';
+import { Profile } from '@/types/profile';
 
 interface DetailsModalProps {
   profile: Profile;
@@ -107,12 +107,12 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
             <div className="flex items-center gap-1 text-gray-700">
               <h4 className="font-semibold text-gray-900">Available Spaces</h4>
               <span className="ml-auto bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                {profile.available_spaces.length}
+                {(profile.available_spaces || []).length}
               </span>
             </div>
             <div className="overflow-x-auto no-scrollbar cursor-grab pb-3 -mx-2 px-2">
               <div className="flex gap-3 min-w-max">
-                {profile.available_spaces.map((space, index) => (
+                {(profile.available_spaces || []).map((space, index) => (
                   <div
                     key={index}
                     className="flex-shrink-0 bg-gray-100 rounded-lg px-3 py-1 text-sm transition-colors cursor-pointer"
