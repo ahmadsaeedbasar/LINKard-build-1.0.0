@@ -31,30 +31,30 @@ const HireModal: React.FC<HireModalProps> = ({ creatorId, creatorName, isOpen, o
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white w-full max-w-md rounded-3xl overflow-hidden shadow-2xl">
-        <div className="p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-gray-900">Hire {creatorName}</h2>
+      <div className="bg-white w-full max-w-md rounded-[2.5rem] overflow-hidden shadow-2xl">
+        <div className="p-8 md:p-10">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 tracking-tight">Hire {creatorName}</h2>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
-              <X className="w-6 h-6 text-gray-500" />
+              <X className="w-6 h-6 text-gray-400" />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Project Brief</label>
+              <label className="block text-sm font-bold text-gray-700 mb-2 px-1">Project Brief</label>
               <textarea
                 required
-                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all resize-none h-32"
+                className="w-full px-5 py-4 border border-gray-200 rounded-[1.5rem] focus:ring-2 focus:ring-black focus:border-transparent outline-none transition-all resize-none h-40 text-gray-700"
                 placeholder="Tell the creator about your campaign goals, budget, and timeline..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
               />
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-2xl mb-4">
-              <p className="text-sm text-blue-700 leading-relaxed">
-                <strong>ProTip:</strong> Creators respond faster when you include specific dates and budget ranges.
+            <div className="bg-blue-50/50 p-5 rounded-2xl mb-4 border border-blue-100">
+              <p className="text-sm text-blue-700 leading-relaxed font-medium">
+                <strong className="block mb-1">💡 ProTip:</strong> Creators respond faster when you include specific dates and budget ranges.
               </p>
             </div>
 

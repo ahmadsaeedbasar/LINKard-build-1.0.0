@@ -87,7 +87,6 @@ const SignupInfluencer = () => {
 
     setUsernameStatus(prev => ({ ...prev, checking: true, message: 'Checking…' }));
 
-    // Simulating API call
     setTimeout(() => {
       const isAvailable = u.toLowerCase() !== 'admin' && u.toLowerCase() !== 'test';
       setUsernameStatus({
@@ -104,12 +103,10 @@ const SignupInfluencer = () => {
     setFormData(prev => {
       const newData = { ...prev, [name]: value };
       
-      // Auto-fill display name
       if ((name === 'firstName' || name === 'lastName') && !isDisplayNameDirty) {
         newData.displayName = (newData.firstName + ' ' + newData.lastName).trim();
       }
 
-      // Auto-fill contact email
       if (name === 'email' && !isContactEmailDirty) {
         newData.contactEmail = value;
       }
@@ -139,7 +136,6 @@ const SignupInfluencer = () => {
     }
   };
 
-  // Password indicators
   useEffect(() => {
     const v = formData.password;
     if (!v) {
@@ -169,7 +165,6 @@ const SignupInfluencer = () => {
     }
   }, [formData.password, formData.passwordConfirm]);
 
-  // Form validation
   useEffect(() => {
     const validateEmail = (v: string) => v.length >= 5 && v.includes('@') && v.includes('.') && !v.endsWith('.');
     const { username, firstName, displayName, email, contactEmail, password, passwordConfirm } = formData;
@@ -201,211 +196,165 @@ const SignupInfluencer = () => {
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
       <Header />
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative">
+      <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-8 sm:px-6 lg:px-8 z-0 relative">
         <div className="max-w-2xl mx-auto">
-          <h1 className="text-2xl font-semibold mb-6 text-center">Create Your Influencer Profile</h1>
-          <form onSubmit={handleSubmit} className="space-y-5 bg-white border rounded-lg p-6 shadow-sm">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Username *</label>
-              <div className="relative">
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent pr-24"
-                  required
-                  value={formData.username}
-                  onChange={handleInputChange}
-                />
-                <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs ${usernameStatus.className}`}>
-                  {usernameStatus.message}
-                </span>
+          <h1 className="text-3xl font-bold mb-2 text-center">Join as an Influencer</h1>
+          <p className="text-gray-500 text-center mb-10 font-medium">Create your professional profile and start connecting with top brands.</p>
+          
+          <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 shadow-sm">
+            <div className="space-y-4">
+              <h2 className="text-xl font-bold px-1">Basic Information</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="username" className="block text-sm font-bold text-gray-700 mb-2">Username *</label>
+                  <div className="relative">
+                    <input
+                      id="username"
+                      name="username"
+                      type="text"
+                      className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all pr-24"
+                      required
+                      placeholder="johndoe"
+                      value={formData.username}
+                      onChange={handleInputChange}
+                    />
+                    <span className={`absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold ${usernameStatus.className}`}>
+                      {usernameStatus.message}
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <label htmlFor="displayName" className="block text-sm font-bold text-gray-700 mb-2">Display Name *</label>
+                  <input
+                    id="displayName"
+                    name="displayName"
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    required
+                    placeholder="John Doe"
+                    value={formData.displayName}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">First name *</label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  required
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="firstName" className="block text-sm font-bold text-gray-700 mb-2">First Name *</label>
+                  <input
+                    id="firstName"
+                    name="firstName"
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    required
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="lastName" className="block text-sm font-bold text-gray-700 mb-2">Last Name</label>
+                  <input
+                    id="lastName"
+                    name="lastName"
+                    type="text"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Display name *</label>
-              <input
-                id="displayName"
-                name="displayName"
-                type="text"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                required
-                placeholder="Shown on your public profile"
-                value={formData.displayName}
-                onChange={handleInputChange}
-              />
-              <p className="text-xs text-gray-500 mt-1">Auto-generated from first and last name if left empty.</p>
-            </div>
-
-            <div>
-              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
-              <textarea
-                id="bio"
-                name="bio"
-                rows={1}
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-none"
-                placeholder="Write a short bio about yourself…"
-                value={formData.bio}
-                onChange={handleInputChange}
-              />
-              <p className="text-xs text-gray-500 mt-1">Keep it short and catchy. This will appear on your public profile.</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-4 pt-4 border-t border-gray-50">
+              <h2 className="text-xl font-bold px-1">Profile Details</h2>
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  required
-                  value={formData.email}
+                <label htmlFor="bio" className="block text-sm font-bold text-gray-700 mb-2">Bio</label>
+                <textarea
+                  id="bio"
+                  name="bio"
+                  rows={2}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all resize-none"
+                  placeholder="Share what makes your content unique..."
+                  value={formData.bio}
                   onChange={handleInputChange}
                 />
               </div>
-              <div>
-                <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">Contact email *</label>
-                <input
-                  id="contactEmail"
-                  name="contactEmail"
-                  type="email"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  required
-                  placeholder="For business inquiries"
-                  value={formData.contactEmail}
-                  onChange={handleInputChange}
-                />
-                <p className="text-xs text-gray-500 mt-1">Auto-filled from email.</p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-bold text-gray-700 mb-2">Account Email *</label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    required
+                    placeholder="john@example.com"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="contactEmail" className="block text-sm font-bold text-gray-700 mb-2">Business Contact Email *</label>
+                  <input
+                    id="contactEmail"
+                    name="contactEmail"
+                    type="email"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    required
+                    placeholder="bookings@john.com"
+                    value={formData.contactEmail}
+                    onChange={handleInputChange}
+                  />
+                </div>
               </div>
             </div>
 
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                placeholder="+1 (555) 123-4567"
-                value={formData.phone}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-              <input
-                id="address"
-                name="address"
-                type="text"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                placeholder="Optional"
-                value={formData.address}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <div>
-              <label htmlFor="bookingUrl" className="block text-sm font-medium text-gray-700 mb-1">Booking URL</label>
-              <input
-                id="bookingUrl"
-                name="bookingUrl"
-                type="url"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                placeholder="https://your-booking-link.com"
-                value={formData.bookingUrl}
-                onChange={handleInputChange}
-              />
-              <p className="text-xs text-gray-500 mt-1">Link to your Calendly, cal.com, etc. (Optional)</p>
-            </div>
-            
-            <div>
-              <label htmlFor="profile_image" className="block text-sm font-medium text-gray-700 mb-1">Profile image</label>
-              <input
-                id="profile_image"
-                name="profile_image"
-                type="file"
-                accept="image/*"
-                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                onChange={handleImageChange}
-              />
-            </div>
-            
-            {imagePreview && (
-              <div id="imagePreview" className="mt-2">
-                <img src={imagePreview} className="w-24 h-24 rounded-full object-cover border" alt="Preview" />
-              </div>
-            )}
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                />
-                <p className={`text-xs mt-1 ${passwordStats.strengthClass}`}>{passwordStats.strength}</p>
-              </div>
-              <div>
-                <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-1">Confirm password *</label>
-                <input
-                  id="passwordConfirm"
-                  name="passwordConfirm"
-                  type="password"
-                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
-                  required
-                  value={formData.passwordConfirm}
-                  onChange={handleInputChange}
-                />
-                <p className={`text-xs mt-1 ${passwordStats.matchClass}`}>{passwordStats.matchMessage}</p>
+            <div className="space-y-4 pt-4 border-t border-gray-50">
+              <h2 className="text-xl font-bold px-1">Security</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="password" className="block text-sm font-bold text-gray-700 mb-2">Password *</label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                  />
+                  <p className={`text-[11px] mt-2 ml-1 font-bold uppercase tracking-tight ${passwordStats.strengthClass}`}>{passwordStats.strength}</p>
+                </div>
+                <div>
+                  <label htmlFor="passwordConfirm" className="block text-sm font-bold text-gray-700 mb-2">Confirm Password *</label>
+                  <input
+                    id="passwordConfirm"
+                    name="passwordConfirm"
+                    type="password"
+                    className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
+                    required
+                    value={formData.passwordConfirm}
+                    onChange={handleInputChange}
+                  />
+                  <p className={`text-[11px] mt-2 ml-1 font-bold uppercase tracking-tight ${passwordStats.matchClass}`}>{passwordStats.matchMessage}</p>
+                </div>
               </div>
             </div>
             
             <button
               type="submit"
-              className="w-full px-4 py-2 rounded-md bg-black text-white font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full mt-4 bg-black text-white py-4 rounded-2xl font-bold hover:bg-gray-800 transition-all shadow-lg active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isButtonDisabled}
             >
               {buttonText}
             </button>
           </form>
           
-          <p className="text-sm text-gray-600 mt-4 text-center">
-            Prefer a client account?{' '}
-            <Link className="text-black underline font-medium hover:no-underline" to="/accounts/signup/client">
+          <p className="text-sm text-gray-500 mt-8 text-center font-medium">
+            Looking to hire?{' '}
+            <Link className="text-black underline hover:no-underline font-bold" to="/accounts/signup/client">
               Sign up as Client
             </Link>
           </p>

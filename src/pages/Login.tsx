@@ -27,7 +27,6 @@ const Login = () => {
       setIsLoading(false);
     } else {
       showSuccess("Welcome back!");
-      // Check user role for redirect
       const { data: profile } = await supabase
         .from('profiles')
         .select('role')
@@ -46,26 +45,36 @@ const Login = () => {
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
       <Header />
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative flex items-center justify-center">
-        <div className="max-w-sm mx-auto w-full">
-          <h1 className="text-2xl font-semibold mb-6 text-center">Login</h1>
-          <form onSubmit={handleSubmit} className="space-y-4 bg-white border rounded-lg p-5 shadow-sm">
+        <div className="max-w-md mx-auto w-full">
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-bold tracking-tight">Welcome back</h1>
+            <p className="text-gray-500 mt-2">Log in to your LINKard account</p>
+          </div>
+          
+          <form onSubmit={handleSubmit} className="space-y-6 bg-white border border-gray-200 rounded-[2.5rem] p-8 md:p-10 shadow-sm">
             <div>
-              <label htmlFor="login_email" className="block text-sm text-gray-700 mb-1">Email</label>
+              <label htmlFor="login_email" className="block text-sm font-bold text-gray-700 mb-2">Email</label>
               <input
                 id="login_email"
                 type="email"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-black outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
                 required
+                placeholder="john@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="login_pass" className="block text-sm text-gray-700 mb-1">Password</label>
+              <div className="flex justify-between items-center mb-2">
+                <label htmlFor="login_pass" className="block text-sm font-bold text-gray-700">Password</label>
+                <Link to="/forgot-password" usage="sm" className="text-xs font-bold text-gray-400 hover:text-black transition-colors">
+                  Forgot Password?
+                </Link>
+              </div>
               <input
                 id="login_pass"
                 type="password"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-black outline-none"
+                className="w-full px-4 py-3 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-black outline-none transition-all"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -73,15 +82,16 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className="w-full px-4 py-3 rounded-md bg-black text-white font-bold disabled:opacity-60 transition-all hover:bg-gray-800"
+              className="w-full bg-black text-white py-4 rounded-2xl font-bold hover:bg-gray-800 transition-all shadow-lg active:scale-[0.98] disabled:opacity-60"
               disabled={isLoading}
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? 'Logging in...' : 'Log in'}
             </button>
           </form>
-          <p className="text-sm text-gray-600 mt-4 text-center">
+          
+          <p className="text-sm text-gray-500 mt-8 text-center font-medium">
             Don't have an account?{' '}
-            <Link to="/accounts/signup" className="text-black underline">Sign up</Link>
+            <Link to="/accounts/signup" className="text-black underline hover:no-underline font-bold">Sign up</Link>
           </p>
         </div>
       </main>
