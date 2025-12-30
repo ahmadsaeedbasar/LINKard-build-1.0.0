@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -8,102 +8,406 @@ import { showSuccess } from '@/utils/toast';
 
 const SignupInfluencer = () => {
   const [formData, setFormData] = useState({
-    email: '',
-    fullName: '',
     username: '',
+    firstName: '',
+    lastName: '',
+    displayName: '',
+    bio: '',
+    email: '',
+    contactEmail: '',
+    phone: '',
+    address: '',
+    bookingUrl: '',
     password: '',
+    passwordConfirm: '',
   });
-  const [buttonText, setButtonText] = useState('Create account');
+
+  const [usernameStatus, setUsernameStatus] = useState({
+    checking: false,
+    available: false,
+    message: '',
+    className: 'text-gray-600',
+  });
+
+  const [passwordStats, setPasswordStats] = useState({
+    strength: '8+ characters with letters, numbers, and symbols',
+    strengthClass: 'text-gray-500',
+    matchMessage: '',
+    matchClass: '',
+  });
+
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isDisplayNameDirty, setIsDisplayNameDirty] = useState(false);
+  const [isContactEmailDirty, setIsContactEmailDirty] = useState(false);
+  const [buttonText, setButtonText] = useState('Create Influencer Account');
   const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+  
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Constants
+  const USERNAME_REGEX = /^[a-zA-Z0-9_]+$/;
+  const USERNAME_MIN = 5;
+  const USERNAME_MAX = 30;
+
+  const checkUsername = async (u: string) => {
+    if (!u) {
+      setUsernameStatus({ checking: false, available: false, message: '', className: 'text-gray-600' });
+      return;
+    }
+
+    if (u.length < USERNAME_MIN) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: `✗ Too short (min ${USERNAME_MIN})`,
+        className: 'text-red-600 font-medium',
+      });
+      return;
+    }
+
+    if (u.length > USERNAME_MAX) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: `✗ Too long (max ${USERNAME_MAX})`,
+        className: 'text-red-600 font-medium',
+      });
+      return;
+    }
+
+    if (!USERNAME_REGEX.test(u)) {
+      setUsernameStatus({
+        checking: false,
+        available: false,
+        message: '✗ Invalid (letters, numbers, _ only)',
+        className: 'text-red-600 font-medium',
+      });
+      return;
+    }
+
+    setUsernameStatus(prev => ({ ...prev, checking: true, message: 'Checking…' }));
+
+    // Simulating API call
+    setTimeout(() => {
+      const isAvailable = u.toLowerCase() !== 'admin' && u.toLowerCase() !== 'test';
+      setUsernameStatus({
+        checking: false,
+        available: isAvailable,
+        message: isAvailable ? '✓ Available' : '✗ Taken',
+        className: isAvailable ? 'text-emerald-600 font-medium' : 'text-red-600 font-medium',
+      });
+    }, 500);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => {
+      const newData = { ...prev, [name]: value };
+      
+      // Auto-fill display name
+      if ((name === 'firstName' || name === 'lastName') && !isDisplayNameDirty) {
+        newData.displayName = (newData.firstName + ' ' + newData.lastName).trim();
+      }
+
+      // Auto-fill contact email
+      if (name === 'email' && !isContactEmailDirty) {
+        newData.contactEmail = value;
+      }
+      
+      return newData;
+    });
+
+    if (name === 'username') {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+      debounceTimer.current = setTimeout(() => checkUsername(value.trim()), 350);
+    }
+
+    if (name === 'displayName') setIsDisplayNameDirty(value.trim().length > 0);
+    if (name === 'contactEmail') setIsContactEmailDirty(value.trim().length > 0);
+  };
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  // Password indicators
+  useEffect(() => {
+    const v = formData.password;
+    if (!v) {
+      setPasswordStats(prev => ({ ...prev, strength: '8+ characters with letters, numbers, and symbols', strengthClass: 'text-gray-500' }));
+      return;
+    }
+    let score = 0;
+    if (v.length >= 8) score++;
+    if (/[A-Z]/.test(v)) score++;
+    if (/[a-z]/.test(v)) score++;
+    if (/[0-9]/.test(v)) score++;
+    if (/[^A-Za-z0-9]/.test(v)) score++;
+    const levels = ['Very weak', 'Weak', 'Okay', 'Good', 'Strong', 'Very strong'];
+    const colors = ['text-red-600', 'text-orange-600', 'text-yellow-600', 'text-blue-600', 'text-indigo-600', 'text-emerald-600'];
+    setPasswordStats(prev => ({ ...prev, strength: `Strength: ${levels[Math.min(score, 5)]}`, strengthClass: colors[Math.min(score, 5)] }));
+  }, [formData.password]);
 
   useEffect(() => {
-    const { email, fullName, username, password } = formData;
+    const { password: p1, passwordConfirm: p2 } = formData;
+    if (!p2) { setPasswordStats(prev => ({ ...prev, matchMessage: '', matchClass: '' })); return; }
+    if (p1 === p2 && p1.length >= 8) {
+      setPasswordStats(prev => ({ ...prev, matchMessage: '✓ Passwords match', matchClass: 'text-emerald-600 font-medium' }));
+    } else if (p1 === p2) {
+      setPasswordStats(prev => ({ ...prev, matchMessage: '✓ Passwords match (too short)', matchClass: 'text-yellow-600 font-medium' }));
+    } else {
+      setPasswordStats(prev => ({ ...prev, matchMessage: '✗ Passwords don’t match', matchClass: 'text-red-600 font-medium' }));
+    }
+  }, [formData.password, formData.passwordConfirm]);
+
+  // Form validation
+  useEffect(() => {
+    const validateEmail = (v: string) => v.length >= 5 && v.includes('@') && v.includes('.') && !v.endsWith('.');
+    const { username, firstName, displayName, email, contactEmail, password, passwordConfirm } = formData;
     let reason = '';
-    if (!email.trim()) reason = 'Enter email';
-    else if (!fullName.trim()) reason = 'Enter full name';
-    else if (!username.trim()) reason = 'Choose username';
-    else if (password.length < 6) reason = 'Password too short (min 6)';
+    if (!username.trim()) reason = 'Enter username';
+    else if (usernameStatus.checking) reason = 'Checking username...';
+    else if (!usernameStatus.available) reason = 'Choose another username';
+    else if (!firstName.trim()) reason = 'Enter first name';
+    else if (!displayName.trim()) reason = 'Enter display name';
+    else if (!email.trim()) reason = 'Enter email';
+    else if (!validateEmail(email)) reason = 'Enter valid email';
+    else if (!contactEmail.trim()) reason = 'Enter contact email';
+    else if (!validateEmail(contactEmail)) reason = 'Enter valid contact email';
+    else if (!password) reason = 'Enter password';
+    else if (password.length < 8) reason = 'Password too short';
+    else if (!passwordConfirm) reason = 'Confirm password';
+    else if (password !== passwordConfirm) reason = 'Passwords don’t match';
     
     setIsButtonDisabled(!!reason);
-    setButtonText(reason || 'Sign Up');
-  }, [formData]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+    setButtonText(reason || 'Create Influencer Account');
+  }, [formData, usernameStatus]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    showSuccess("Influencer account simulated! Welcome to ProOmo.");
+    if (isButtonDisabled) return;
+    showSuccess("Influencer account created successfully!");
   };
 
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
       <Header />
-      <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative flex items-center justify-center">
-        <div className="max-w-sm mx-auto w-full">
-          <h1 className="text-2xl font-semibold mb-2 text-center">Join as an Influencer</h1>
-          <p className="text-gray-600 text-center mb-6">Start showcasing your digital reach.</p>
-          <form onSubmit={handleSubmit} className="space-y-4 bg-white border rounded-lg p-5 shadow-sm">
+      <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative">
+        <div className="max-w-2xl mx-auto">
+          <h1 className="text-2xl font-semibold mb-6 text-center">Create Your Influencer Profile</h1>
+          <form onSubmit={handleSubmit} className="space-y-5 bg-white border rounded-lg p-6 shadow-sm">
             <div>
-              <label className="block text-sm text-gray-700 mb-1 font-medium">Email</label>
-              <input
-                name="email"
-                type="email"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-black focus:outline-none transition-all"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                placeholder="influencer@example.com"
-              />
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">Username *</label>
+              <div className="relative">
+                <input
+                  id="username"
+                  name="username"
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent pr-24"
+                  required
+                  value={formData.username}
+                  onChange={handleInputChange}
+                />
+                <span className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs ${usernameStatus.className}`}>
+                  {usernameStatus.message}
+                </span>
+              </div>
             </div>
-            {/* ... rest of form fields ... */}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">First name *</label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  required
+                  value={formData.firstName}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">Last name</label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  value={formData.lastName}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+
             <div>
-              <label className="block text-sm text-gray-700 mb-1 font-medium">Full Name</label>
+              <label htmlFor="displayName" className="block text-sm font-medium text-gray-700 mb-1">Display name *</label>
               <input
-                name="fullName"
+                id="displayName"
+                name="displayName"
                 type="text"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-black focus:outline-none transition-all"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 required
-                value={formData.fullName}
-                onChange={handleChange}
-                placeholder="John Doe"
+                placeholder="Shown on your public profile"
+                value={formData.displayName}
+                onChange={handleInputChange}
+              />
+              <p className="text-xs text-gray-500 mt-1">Auto-generated from first and last name if left empty.</p>
+            </div>
+
+            <div>
+              <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
+              <textarea
+                id="bio"
+                name="bio"
+                rows={1}
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent resize-none"
+                placeholder="Write a short bio about yourself…"
+                value={formData.bio}
+                onChange={handleInputChange}
+              />
+              <p className="text-xs text-gray-500 mt-1">Keep it short and catchy. This will appear on your public profile.</p>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">Contact email *</label>
+                <input
+                  id="contactEmail"
+                  name="contactEmail"
+                  type="email"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  required
+                  placeholder="For business inquiries"
+                  value={formData.contactEmail}
+                  onChange={handleInputChange}
+                />
+                <p className="text-xs text-gray-500 mt-1">Auto-filled from email.</p>
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="+1 (555) 123-4567"
+                value={formData.phone}
+                onChange={handleInputChange}
               />
             </div>
+
             <div>
-              <label className="block text-sm text-gray-700 mb-1 font-medium">Username</label>
+              <label htmlFor="address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
               <input
-                name="username"
+                id="address"
+                name="address"
                 type="text"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-black focus:outline-none transition-all"
-                required
-                value={formData.username}
-                onChange={handleChange}
-                placeholder="johndoe_social"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="Optional"
+                value={formData.address}
+                onChange={handleInputChange}
               />
             </div>
+
             <div>
-              <label className="block text-sm text-gray-700 mb-1 font-medium">Password</label>
+              <label htmlFor="bookingUrl" className="block text-sm font-medium text-gray-700 mb-1">Booking URL</label>
               <input
-                name="password"
-                type="password"
-                className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-black focus:outline-none transition-all"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="••••••••"
+                id="bookingUrl"
+                name="bookingUrl"
+                type="url"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="https://your-booking-link.com"
+                value={formData.bookingUrl}
+                onChange={handleInputChange}
+              />
+              <p className="text-xs text-gray-500 mt-1">Link to your Calendly, cal.com, etc. (Optional)</p>
+            </div>
+            
+            <div>
+              <label htmlFor="profile_image" className="block text-sm font-medium text-gray-700 mb-1">Profile image</label>
+              <input
+                id="profile_image"
+                name="profile_image"
+                type="file"
+                accept="image/*"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                onChange={handleImageChange}
               />
             </div>
+            
+            {imagePreview && (
+              <div id="imagePreview" className="mt-2">
+                <img src={imagePreview} className="w-24 h-24 rounded-full object-cover border" alt="Preview" />
+              </div>
+            )}
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">Password *</label>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  required
+                  value={formData.password}
+                  onChange={handleInputChange}
+                />
+                <p className={`text-xs mt-1 ${passwordStats.strengthClass}`}>{passwordStats.strength}</p>
+              </div>
+              <div>
+                <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 mb-1">Confirm password *</label>
+                <input
+                  id="passwordConfirm"
+                  name="passwordConfirm"
+                  type="password"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  required
+                  value={formData.passwordConfirm}
+                  onChange={handleInputChange}
+                />
+                <p className={`text-xs mt-1 ${passwordStats.matchClass}`}>{passwordStats.matchMessage}</p>
+              </div>
+            </div>
+            
             <button
               type="submit"
-              className="w-full px-4 py-2 mt-2 rounded-md bg-black text-white font-bold disabled:opacity-50 transition-all hover:bg-gray-800"
+              className="w-full px-4 py-2 rounded-md bg-black text-white font-medium transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isButtonDisabled}
             >
               {buttonText}
             </button>
           </form>
+          
           <p className="text-sm text-gray-600 mt-4 text-center">
-            <Link to="/accounts/signup" className="text-gray-500 hover:text-black transition-colors">← Back to selection</Link>
+            Prefer a client account?{' '}
+            <Link className="text-black underline font-medium hover:no-underline" to="/accounts/signup/client">
+              Sign up as Client
+            </Link>
           </p>
         </div>
       </main>
