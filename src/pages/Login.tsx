@@ -25,19 +25,31 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // For demo purposes, we accept any credentials
-    login(username.includes('@') ? username : `${username}@example.com`, 'client');
+    // For demo purposes, we treat 'talha' or emails with 'creator' as influencers
+    const role = (username.toLowerCase().includes('talha') || username.toLowerCase().includes('creator')) 
+      ? 'influencer' 
+      : 'client';
+    
+    login(username.includes('@') ? username : `${username}@example.com`, role);
     showSuccess("Welcome back!");
-    navigate('/');
+    
+    if (role === 'influencer') {
+      navigate('/dashboard');
+    } else {
+      navigate('/');
+    }
   };
 
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
       <Header />
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative flex items-center justify-center">
-        <div className="max-w-sm mx-auto w-full">
+        <div className="max-sm mx-auto w-full">
           <h1 className="text-2xl font-semibold mb-6 text-center">Login</h1>
           <form onSubmit={handleSubmit} className="space-y-4 bg-white border rounded-lg p-5 shadow-sm">
+            <div className="bg-blue-50 p-3 rounded-lg text-xs text-blue-700 mb-4">
+              Tip: Use <strong>"talha"</strong> to login as an Influencer.
+            </div>
             <div>
               <label htmlFor="login_user" className="block text-sm text-gray-700 mb-1">Username or Email</label>
               <input

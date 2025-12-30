@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Search as SearchIcon, LogOut, User as UserIcon } from 'lucide-react';
+import { Search as SearchIcon, LogOut, User as UserIcon, LayoutDashboard } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { useAuth } from '@/context/AuthContext';
 
@@ -58,7 +58,7 @@ const Header = () => {
             >
               <svg className="w-9 h-9 md:w-10 md:h-10" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="220" height="220" rx="50" fill="black" />
-                <path d="M110.088 46.2382L161.079 156.475L123.389 156.237L109.7 173.5L95.8899 155.999L58.08 155.999L110.088 46.2382Z" fill="white" />
+                <path d="M110.088 46.2382L161.079 156.475L123.389 156.237L109.7 173.5L109.7 173.5L95.8899 155.999L58.08 155.999L110.088 46.2382Z" fill="white" />
                 <path d="M109.7 173.5L110.089 46.2386L95.8899 155.999L109.7 173.5Z" fill="url(#paint0_linear_431_67)" />
                 <path d="M123.389 156.237L110.088 46.2383L109.7 173.5L123.389 156.237Z" fill="url(#paint1_linear_431_67)" />
                 <defs>
@@ -87,6 +87,13 @@ const Header = () => {
             
             {isAuthenticated ? (
               <div className="flex items-center gap-6">
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
+                </Link>
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                   <UserIcon className="w-4 h-4" />
                   {user?.name}
@@ -123,7 +130,11 @@ const Header = () => {
             <Link to="/search" className="p-2 text-gray-500 hover:text-black transition-colors">
               <SearchIcon className="w-6 h-6" />
             </Link>
-            {!isAuthenticated && (
+            {isAuthenticated ? (
+               <Link to="/dashboard" className="p-2 text-gray-500 hover:text-black transition-colors">
+                 <LayoutDashboard className="w-6 h-6" />
+               </Link>
+            ) : (
               <Link to="/accounts/signup" className="bg-black text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm">
                 Join Now
               </Link>
