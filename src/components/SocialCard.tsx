@@ -1,9 +1,10 @@
 "use client";
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { BadgeCheck, Users, MapPin, User, ExternalLink } from 'lucide-react';
 import { Profile } from '@/data/featuredProfiles';
+import { useAnalytics } from '@/hooks/useAnalytics';
 
 interface SocialCardProps {
   profile: Profile;
@@ -11,6 +12,9 @@ interface SocialCardProps {
 }
 
 const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
+  const { sendEvent } = useAnalytics();
+  const cardRef = useRef<HTMLElement>(null);
+
   const getPlatformColor = (platform: Profile['platform']) => {
     switch (platform) {
       case 'youtube': return 'bg-red-600';
@@ -37,8 +41,16 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
     }
   };
 
+  const handleSocialClick = (eventType: string) => {
+    sendEvent('/api/a/s1/', {
+      social_account_id: profile.id,
+      event_type: eventType
+    });
+  };
+
   return (
     <article
+      ref={cardRef}
       className="social-card analytics-card bg-white rounded-xl border border-gray-200 flex flex-col h-full overflow-hidden"
       data-social-id={profile.id}
       data-track-impression
@@ -52,7 +64,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
             <Link
               to={profile.profileLink}
               className="block w-16 h-16 rounded-full p-0.5 hover:opacity-90 transition-opacity"
-              data-social-click="profile_image_link"
+              onClick={() => handleSocialClick('profile_image_link')}
             >
               <img src={profile.profileImage} alt="profile" className="w-full h-full object-cover rounded-full" />
             </Link>
@@ -114,15 +126,17 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
           <Link
             to={profile.profileLink}
             className="inline-flex justify-center items-center px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
-            data-social-click="profile_link"
+            onClick={() => handleSocialClick('profile_link')}
             title="View User Profile"
           >
             <User className="w-4 h-4 text-gray-700" />
           </Link>
           <button
-            onClick={() => onOpenDetails(profile.id)}
+            onClick={() => {
+              onOpenDetails(profile.id);
+              handleSocialClick('details_modal');
+            }}
             className="inline-flex justify-center items-center w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
-            data-social-click="details_modal"
           >
             Details
           </button>
@@ -131,7 +145,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex justify-center items-center w-full px-4 py-2.5 bg-gray-100 text-black rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors gap-2 border border-gray-300"
-            data-social-click="social_account_link"
+            onClick={() => handleSocialClick('social_account_link')}
           >
             Visit
             <ExternalLink className="w-4 h-4" />

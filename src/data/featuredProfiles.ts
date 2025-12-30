@@ -48,7 +48,7 @@ export const featuredProfiles: Profile[] = [
     startPrice: '$350',
     availableSpaces: ['Post', 'Thread', 'Retweet', 'Bio_Link', 'Pinned_Post'],
     profileLink: '@talha',
-    socialLink: 'https://www.instagram.com/talha_khallid', // Original HTML had instagram link for twitter profile
+    socialLink: 'https://www.instagram.com/talha_khallid',
     contentType: 'Personal Presence',
   },
   {
@@ -65,7 +65,7 @@ export const featuredProfiles: Profile[] = [
     startPrice: '$50',
     availableSpaces: ['Post', 'Bio_Link'],
     profileLink: '@talha',
-    socialLink: 'https://www.x.com/talha_khalid', // Original HTML had x.com link for threads profile
+    socialLink: 'https://www.x.com/talha_khalid',
     contentType: 'Personal Presence',
   },
   {
@@ -117,6 +117,23 @@ export const featuredProfiles: Profile[] = [
     availableSpaces: ['Post', 'Repost', 'Bio_Link', 'Custom'],
     profileLink: '@mohsin',
     socialLink: 'https://www.threads.com/@mohsin',
+    contentType: 'Content-First',
+  },
+  {
+    id: '3WissMc2nR6Fk4oQZUHjHy',
+    name: 'D. Jogs',
+    platform: 'youtube',
+    platformLabel: 'YouTube',
+    platformColorClass: 'bg-red-600',
+    profileImage: '/media/Social Account/G3_7Jq4XsAASD98.jpeg',
+    isVerified: true,
+    category: 'Gaming',
+    location: 'United States',
+    followers: '450.0k',
+    startPrice: '$10.0k',
+    availableSpaces: ['Video', 'Shorts', 'Community_Post', 'Bio_Link', 'Live_Stream', 'Custom'],
+    profileLink: '@mohsin',
+    socialLink: 'https://www.youtube.com/mohsin',
     contentType: 'Content-First',
   },
 ];

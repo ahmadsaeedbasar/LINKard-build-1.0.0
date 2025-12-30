@@ -13,10 +13,26 @@ const platforms = [
   { value: 'tw', label: 'X / Twitter' },
 ];
 
-const HeroSection = () => {
+interface HeroSectionProps {
+  initialQuery?: string;
+  initialPlatformValue?: string;
+}
+
+const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPlatformValue = '' }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedPlatform, setSelectedPlatform] = useState(platforms[0]);
+  const [selectedPlatform, setSelectedPlatform] = useState(
+    platforms.find(p => p.value === initialPlatformValue) || platforms[0]
+  );
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setSelectedPlatform(platforms.find(p => p.value === initialPlatformValue) || platforms[0]);
+  }, [initialPlatformValue]);
+
+  useEffect(() => {
+    setSearchQuery(initialQuery);
+  }, [initialQuery]);
 
   const toggleDropdown = () => {
     setIsDropdownOpen((prev) => !prev);
@@ -62,6 +78,8 @@ const HeroSection = () => {
                 name="q"
                 className="block w-full pl-12 pr-5 py-3 md:py-5 text-gray-900 placeholder-gray-400 focus:outline-none text-base font-medium md:placeholder:text-base placeholder:text-sm placeholder:font-normal bg-transparent"
                 placeholder="Search by category (eg. 'tech', 'finance')"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
