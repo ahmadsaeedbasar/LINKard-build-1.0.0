@@ -9,14 +9,14 @@ import { showSuccess } from '@/utils/toast';
 import { Save, ChevronLeft } from 'lucide-react';
 
 const EditProfile = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    displayName: user?.name || '',
-    bio: 'Professional creator specializing in authentic content storytelling.',
-    category: 'Lifestyle',
-    location: 'United States',
-    startPrice: '$350',
+    displayName: profile?.display_name || user?.user_metadata?.display_name || '',
+    bio: profile?.bio || 'Professional creator specializing in authentic content storytelling.',
+    category: profile?.category || 'Lifestyle',
+    location: profile?.location || 'United States',
+    startPrice: profile?.start_price || '$350',
   });
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -16,13 +16,13 @@ interface HireModalProps {
 const HireModal: React.FC<HireModalProps> = ({ creatorId, creatorName, isOpen, onClose }) => {
   const [message, setMessage] = useState('');
   const { sendInquiry } = useInquiries();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const brandName = user?.name || 'Anonymous Brand';
+    const brandName = profile?.display_name || user?.user_metadata?.display_name || 'Anonymous Brand';
     sendInquiry(creatorId, brandName, message);
     showSuccess(`Inquiry sent to ${creatorName}!`);
     setMessage('');

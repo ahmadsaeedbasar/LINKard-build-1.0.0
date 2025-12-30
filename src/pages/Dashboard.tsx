@@ -17,7 +17,7 @@ import {
 } from 'lucide-react';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { inquiries } = useInquiries();
 
   const stats = [
@@ -33,7 +33,7 @@ const Dashboard = () => {
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold">Welcome back, {user?.name}!</h1>
+            <h1 className="text-3xl font-bold">Welcome back, {profile?.display_name || user?.email}!</h1>
             <p className="text-gray-500">Here's what's happening with your profile today.</p>
           </div>
           <div className="flex gap-3">
@@ -76,12 +76,14 @@ const Dashboard = () => {
                 <div key={inquiry.id} className="p-6 hover:bg-gray-50 transition-colors flex items-center justify-between">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-bold">
-                      {inquiry.brandName[0]}
+                      {(inquiry.brand_name || 'B')[0]}
                     </div>
                     <div>
-                      <div className="font-bold text-gray-900">{inquiry.brandName}</div>
+                      <div className="font-bold text-gray-900">{inquiry.brand_name}</div>
                       <div className="text-sm text-gray-500 line-clamp-1">{inquiry.message}</div>
-                      <div className="text-xs text-gray-400 mt-1">{inquiry.timestamp}</div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        {new Date(inquiry.created_at).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">

@@ -10,7 +10,7 @@ const Header = () => {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { sendEvent } = useAnalytics();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, profile, logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -96,7 +96,7 @@ const Header = () => {
                 </Link>
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                   <UserIcon className="w-4 h-4" />
-                  {user?.name}
+                  {profile?.display_name || user?.email}
                 </div>
                 <button
                   onClick={handleLogout}
