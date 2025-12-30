@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { X, BadgeCheck } from 'lucide-react';
-import { Profile } from '@/data/featuredProfiles';
+import { Profile } from '@/types/profile'; // Updated import
 
 interface DetailsModalProps {
   profile: Profile;
@@ -38,20 +38,20 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
           <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-200">
             <div className="flex items-center gap-3">
               <div className="w-16 h-16 rounded-full bg-gray-100 overflow-hidden flex-shrink-0">
-                <img src={profile.profileImage} alt={`${profile.platform} profile`} className="w-full h-full object-cover" />
+                <img src={profile.avatar_url || '/placeholder.svg'} alt={`${profile.platform} profile`} className="w-full h-full object-cover" />
               </div>
               <div>
                 <div className="flex items-center">
-                  <h3 className="text-xl font-bold text-gray-900">{profile.name}</h3>
-                  {profile.isVerified && (
+                  <h3 className="text-xl font-bold text-gray-900">{profile.display_name}</h3>
+                  {profile.is_verified && (
                     <BadgeCheck className="w-5 h-5 text-blue-500 flex-shrink-0 ml-1" />
                   )}
                 </div>
-                <p className="text-sm text-gray-600">{profile.platformLabel}</p>
+                <p className="text-sm text-gray-600">{profile.platform_label}</p>
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-gray-900">{profile.followers}</div>
+              <div className="text-2xl font-bold text-gray-900">{profile.followers_count}</div>
               <div className="text-xs text-gray-500 uppercase tracking-wide">
                 {profile.platform === 'linkedin' ? 'Connections' : 'Subscribers'}
               </div>
@@ -62,11 +62,11 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
           <div className="grid grid-cols-2 gap-3 mb-6">
             <div className="text-center bg-gray-50 rounded-lg px-3 py-3">
               <div className="text-xs text-gray-500 uppercase tracking-wide">Content Type</div>
-              <div className="text-sm font-semibold text-gray-900">{profile.contentType}</div>
+              <div className="text-sm font-semibold text-gray-900">{profile.category}</div>
             </div>
             <div className="text-center bg-gray-50 rounded-lg px-3 py-3">
               <div className="text-xs text-gray-500 uppercase tracking-wide">Base Price</div>
-              <div className="text-sm font-semibold text-gray-900">{profile.startPrice}</div>
+              <div className="text-sm font-semibold text-gray-900">{profile.start_price}</div>
             </div>
           </div>
 
@@ -90,12 +90,12 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
             <div className="flex items-center gap-1 text-gray-700">
               <h4 className="font-semibold text-gray-900">Available Spaces</h4>
               <span className="ml-auto bg-gray-100 text-gray-700 text-xs font-bold px-2.5 py-1 rounded-full">
-                {profile.availableSpaces.length}
+                {profile.available_spaces.length}
               </span>
             </div>
             <div className="overflow-x-auto no-scrollbar cursor-grab pb-3 -mx-2 px-2">
               <div className="flex gap-3 min-w-max">
-                {profile.availableSpaces.map((space, index) => (
+                {profile.available_spaces.map((space, index) => (
                   <div
                     key={index}
                     className="flex-shrink-0 bg-gray-100 rounded-lg px-3 py-1 text-sm transition-colors cursor-pointer"

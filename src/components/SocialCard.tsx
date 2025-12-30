@@ -4,9 +4,10 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { BadgeCheck, MapPin, ExternalLink } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { Profile } from '@/types/profile'; // Updated import
 
 interface SocialCardProps {
-  profile: any; // Flexible to accommodate DB object
+  profile: Profile; // Updated type
   onOpenDetails: (profileId: string) => void;
 }
 
@@ -40,19 +41,19 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
       data-track-impression
       data-platform={profile.platform}
     >
-      <div className={`h-1.5 w-full ${profile.platformColorClass || 'bg-black'}`}></div>
+      <div className={`h-1.5 w-full ${profile.platform_color_class || 'bg-black'}`}></div>
 
       <div className="p-5 flex flex-col flex-grow">
         <div className="flex items-start gap-4 mb-5">
           <div className="relative flex-shrink-0 inline-block">
             <Link
-              to={`/${profile.username || profile.profileLink?.replace('@', '')}`}
+              to={`/${profile.username}`}
               className="block w-16 h-16 rounded-full p-0.5 hover:opacity-90 transition-opacity"
               onClick={() => handleSocialClick('profile_image_link')}
             >
-              <img src={profile.profileImage || profile.avatar_url || '/placeholder.svg'} alt="profile" className="w-full h-full object-cover rounded-full" />
+              <img src={profile.avatar_url || '/placeholder.svg'} alt="profile" className="w-full h-full object-cover rounded-full" />
             </Link>
-            {profile.isVerified && (
+            {profile.is_verified && (
               <div className="absolute bottom-1 -right-1 bg-white rounded-full z-10">
                 <BadgeCheck className="w-5 h-5 text-blue-500" />
               </div>
@@ -60,9 +61,9 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex justify-between items-start">
-              <h3 className="text-lg font-bold text-gray-900 truncate mr-2">{profile.display_name || profile.name}</h3>
+              <h3 className="text-lg font-bold text-gray-900 truncate mr-2">{profile.display_name}</h3>
               <span className={`flex-shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-bold border ${getPlatformBadgeColor(profile.platform)}`}>
-                {profile.platformLabel || profile.platform_label}
+                {profile.platform_label}
               </span>
             </div>
             <div className="flex gap-2 mt-1.5">
@@ -79,14 +80,14 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
 
         <div className="flex items-center justify-between mb-6 px-1">
           <div className="flex flex-col">
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.followers || profile.followers_count}</span>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.followers_count}</span>
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
               Reach
             </span>
           </div>
           <div className="h-8 w-px bg-gray-200"></div>
           <div className="flex flex-col items-end">
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.startPrice || profile.start_price}</span>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.start_price}</span>
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Base Rate</span>
           </div>
         </div>
@@ -94,7 +95,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
         <div className="mb-6 overflow-hidden">
           <h4 className="text-xs font-bold text-gray-900 uppercase tracking-wide mb-2">Available Spaces</h4>
           <div className="flex gap-2 overflow-x-auto no-scrollbar cursor-grab">
-            {(profile.availableSpaces || profile.available_spaces || []).map((space: string, index: number) => (
+            {(profile.available_spaces || []).map((space: string, index: number) => (
               <span
                 key={index}
                 className="flex-shrink-0 inline-flex items-center px-3 py-1.5 rounded-lg bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 whitespace-nowrap"
@@ -107,7 +108,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
 
         <div className="flex gap-2">
           <Link
-            to={`/${profile.username || profile.profileLink?.replace('@', '')}`}
+            to={`/${profile.username}`}
             className="inline-flex justify-center items-center px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
             onClick={() => handleSocialClick('profile_link')}
           >
@@ -123,7 +124,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
             Details
           </button>
           <a
-            href={profile.socialLink || profile.social_link || '#'}
+            href={profile.social_link || '#'}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex justify-center items-center w-full px-4 py-2.5 bg-gray-100 text-black rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors gap-2 border border-gray-300"

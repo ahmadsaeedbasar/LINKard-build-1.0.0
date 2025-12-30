@@ -8,6 +8,7 @@ import HireModal from '@/components/HireModal';
 import PortfolioGallery from '@/components/PortfolioGallery';
 import { useProfileByHandle } from '@/hooks/useProfilesData';
 import { BadgeCheck, MapPin, Globe, Mail, Instagram, Youtube, Twitter, ExternalLink, Loader2 } from 'lucide-react';
+import { Profile } from '@/types/profile'; // Import Profile type
 
 const CreatorProfile = () => {
   const { handle } = useParams();

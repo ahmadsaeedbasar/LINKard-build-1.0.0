@@ -10,6 +10,7 @@ import DetailsModal from '@/components/DetailsModal';
 import Footer from '@/components/Footer';
 import { useProfilesData } from '@/hooks/useProfilesData';
 import { Loader2 } from 'lucide-react';
+import { Profile } from '@/types/profile'; // Import Profile type
 
 const Search = () => {
   const [searchParams] = useSearchParams();
@@ -19,7 +20,7 @@ const Search = () => {
   const { data: profiles, isLoading } = useProfilesData(query, platform);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
 
-  const selectedProfile = profiles?.find(p => p.id === selectedProfileId);
+  const selectedProfile = profiles?.find((p): p is Profile => p.id === selectedProfileId); // Explicitly type selectedProfile
 
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
@@ -51,18 +52,7 @@ const Search = () => {
                   profiles.map((profile) => (
                     <SocialCard 
                       key={profile.id} 
-                      profile={{
-                        ...profile,
-                        platformLabel: profile.platform_label,
-                        platformColorClass: profile.platform_color_class,
-                        profileImage: profile.avatar_url || '/placeholder.svg',
-                        isVerified: profile.is_verified,
-                        followers: profile.followers_count,
-                        startPrice: profile.start_price,
-                        availableSpaces: profile.available_spaces || [],
-                        profileLink: `@${profile.username}`,
-                        socialLink: profile.social_link || '#'
-                      }} 
+                      profile={profile} // Pass profile directly
                       onOpenDetails={(id) => setSelectedProfileId(id)} 
                     />
                   ))
@@ -80,18 +70,7 @@ const Search = () => {
 
       {selectedProfile && (
         <DetailsModal
-          profile={{
-            ...selectedProfile,
-            platformLabel: selectedProfile.platform_label,
-            platformColorClass: selectedProfile.platform_color_class,
-            profileImage: selectedProfile.avatar_url || '/placeholder.svg',
-            isVerified: selectedProfile.is_verified,
-            followers: selectedProfile.followers_count,
-            startPrice: selectedProfile.start_price,
-            availableSpaces: selectedProfile.available_spaces || [],
-            profileLink: `@${selectedProfile.username}`,
-            socialLink: selectedProfile.social_link || '#'
-          }}
+          profile={selectedProfile} // Pass profile directly
           isOpen={!!selectedProfileId}
           onClose={() => setSelectedProfileId(null)}
         />

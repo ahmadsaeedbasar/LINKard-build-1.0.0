@@ -2,9 +2,10 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Profile } from '@/types/profile'; // Import Profile type
 
 export const useProfilesData = (searchQuery?: string, platform?: string) => {
-  return useQuery({
+  return useQuery<Profile[]>({ // Specify return type
     queryKey: ['profiles', searchQuery, platform],
     queryFn: async () => {
       let query = supabase
@@ -22,13 +23,13 @@ export const useProfilesData = (searchQuery?: string, platform?: string) => {
 
       const { data, error } = await query.order('followers_count', { ascending: false });
       if (error) throw error;
-      return data;
+      return data as Profile[]; // Cast data to Profile[]
     }
   });
 };
 
 export const useFeaturedProfiles = () => {
-  return useQuery({
+  return useQuery<Profile[]>({ // Specify return type
     queryKey: ['featured-profiles'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -39,13 +40,13 @@ export const useFeaturedProfiles = () => {
         .limit(6);
       
       if (error) throw error;
-      return data;
+      return data as Profile[]; // Cast data to Profile[]
     }
   });
 };
 
 export const useProfileByHandle = (handle: string) => {
-  return useQuery({
+  return useQuery<Profile>({ // Specify return type
     queryKey: ['profile', handle],
     queryFn: async () => {
       // Handle can be @username or username
@@ -57,7 +58,7 @@ export const useProfileByHandle = (handle: string) => {
         .single();
       
       if (error) throw error;
-      return data;
+      return data as Profile; // Cast data to Profile
     },
     enabled: !!handle
   });

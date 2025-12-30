@@ -17,8 +17,7 @@ import EditProfile from "./pages/EditProfile";
 import AnalyticsProvider from "./components/AnalyticsProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
-import { ProfileProvider } from "./context/ProfileContext";
-import { InquiryProvider } from "./context/InquiryContext";
+import { InquiryProvider } from "./context/InquiryContext"; // Removed ProfileProvider import
 
 const queryClient = new QueryClient();
 
@@ -29,28 +28,27 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <ProfileProvider>
-            <InquiryProvider>
-              <AnalyticsProvider>
-                <Routes>
-                  <Route path="/" element={<Index />} />
-                  <Route path="/search" element={<Search />} />
-                  <Route path="/accounts/login" element={<Login />} />
-                  <Route path="/accounts/signup" element={<Signup />} />
-                  <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
-                  <Route path="/accounts/signup/client" element={<SignupClient />} />
-                  
-                  {/* Private Routes */}
-                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-                  <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
-                  <Route path="/settings/profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
-                  
-                  <Route path="/:handle" element={<CreatorProfile />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </AnalyticsProvider>
-            </InquiryProvider>
-          </ProfileProvider>
+          {/* Removed ProfileProvider */}
+          <InquiryProvider>
+            <AnalyticsProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/accounts/login" element={<Login />} />
+                <Route path="/accounts/signup" element={<Signup />} />
+                <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
+                <Route path="/accounts/signup/client" element={<SignupClient />} />
+                
+                {/* Private Routes */}
+                <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                <Route path="/settings/profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+                
+                <Route path="/:handle" element={<CreatorProfile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnalyticsProvider>
+          </InquiryProvider>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
