@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, Users, MapPin, User, ExternalLink } from 'lucide-react';
+import { BadgeCheck, MapPin, ExternalLink } from 'lucide-react';
 import { Profile } from '@/data/featuredProfiles';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
@@ -13,20 +13,6 @@ interface SocialCardProps {
 
 const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
   const { sendEvent } = useAnalytics();
-  const cardRef = useRef<HTMLElement>(null);
-
-  const getPlatformColor = (platform: Profile['platform']) => {
-    switch (platform) {
-      case 'youtube': return 'bg-red-600';
-      case 'twitter': return 'bg-black';
-      case 'threads': return 'bg-gray-600';
-      case 'linkedin': return 'bg-blue-700';
-      case 'instagram': return 'bg-pink-600';
-      case 'facebook': return 'bg-blue-600';
-      case 'tiktok': return 'bg-black';
-      default: return 'bg-gray-400';
-    }
-  };
 
   const getPlatformBadgeColor = (platform: Profile['platform']) => {
     switch (platform) {
@@ -50,19 +36,18 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
 
   return (
     <article
-      ref={cardRef}
       className="social-card analytics-card bg-white rounded-xl border border-gray-200 flex flex-col h-full overflow-hidden"
       data-social-id={profile.id}
       data-track-impression
       data-platform={profile.platform}
     >
-      <div className={`h-1.5 w-full ${getPlatformColor(profile.platform)}`}></div>
+      <div className={`h-1.5 w-full ${profile.platformColorClass}`}></div>
 
       <div className="p-5 flex flex-col flex-grow">
         <div className="flex items-start gap-4 mb-5">
           <div className="relative flex-shrink-0 inline-block">
             <Link
-              to={profile.profileLink}
+              to={`/${profile.profileLink.replace('@', '')}`}
               className="block w-16 h-16 rounded-full p-0.5 hover:opacity-90 transition-opacity"
               onClick={() => handleSocialClick('profile_image_link')}
             >
@@ -83,7 +68,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
             </div>
             <div className="flex gap-2 mt-1.5">
               <div className="flex items-center text-sm text-gray-600">
-                <Users className="w-4 h-4 mr-1 stroke-gray-400" />
+                <svg className="w-4 h-4 mr-1 stroke-gray-400" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M14 7C15.6569 7 17 5.65685 17 4C17 2.34315 15.6569 1 14 1C12.3431 1 11 2.34315 11 4C11 5.65685 12.3431 7 14 7Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 17C5.65685 17 7 15.6569 7 14C7 12.3431 5.65685 11 4 11C2.34315 11 1 12.3431 1 14C1 15.6569 2.34315 17 4 17Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /><path d="M11 11H17V16C17 16.2652 16.8946 16.5196 16.7071 16.7071C16.5196 16.8946 16.2652 17 16 17H12C11.7348 17 11.4804 16.8946 11.2929 16.7071C11.1054 16.5196 11 16.2652 11 16V11ZM1 1H7V6C7 6.26522 6.89464 6.51957 6.70711 6.70711C6.51957 6.89464 6.26522 7 6 7H2C1.73478 7 1.48043 6.89464 1.29289 6.70711C1.10536 6.51957 1 6.26522 1 6V1Z" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                 <span className="truncate font-medium">{profile.category}</span>
               </div>
               <div className="flex items-center text-sm text-gray-600">
@@ -98,7 +83,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.followers}</span>
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-              {profile.platform === 'linkedin' ? 'Connections' : 'Followers'}
+              {profile.platform === 'linkedin' ? 'Connections' : 'Subscribers'}
             </span>
           </div>
           <div className="h-8 w-px bg-gray-200"></div>
@@ -124,12 +109,12 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
 
         <div className="flex gap-2">
           <Link
-            to={profile.profileLink}
+            to={`/${profile.profileLink.replace('@', '')}`}
             className="inline-flex justify-center items-center px-3 py-2.5 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 transition-colors"
             onClick={() => handleSocialClick('profile_link')}
             title="View User Profile"
           >
-            <User className="w-4 h-4 text-gray-700" />
+            <svg className="w-4 h-4 text-gray-700" viewBox="0 0 31 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" clipRule="evenodd" d="M22.3889 20.4C24.6079 20.4001 26.7412 21.2458 28.3439 22.7607C29.9467 24.2756 30.8951 26.3428 30.9914 28.5311L31 28.9V30.6C31.0003 31.4578 30.6721 32.284 30.0812 32.9129C29.4903 33.5419 28.6804 33.9272 27.8139 33.9915L27.5556 34H3.44444C2.57545 34.0003 1.73847 33.6763 1.10128 33.0931C0.464088 32.5098 0.0737857 31.7104 0.00861131 30.855L0 30.6V28.9C0.000128206 26.7096 0.856877 24.6038 2.39158 23.0218C3.92628 21.4397 6.02046 20.5036 8.23739 20.4085L8.61111 20.4H22.3889ZM22.3889 23.8H8.61111C7.29325 23.7999 6.02517 24.297 5.06633 25.1894C4.10749 26.0818 3.53037 27.3022 3.45306 28.6008L3.44444 28.9V30.6H27.5556V28.9C27.5556 27.5991 27.0521 26.3474 26.148 25.401C25.2439 24.4545 24.0076 23.8848 22.692 23.8085L22.3889 23.8ZM15.5 0C17.7838 0 19.9741 0.895533 21.589 2.48959C23.2039 4.08365 24.1111 6.24566 24.1111 8.5C24.1111 10.7543 23.2039 12.9163 21.589 14.5104C19.9741 16.1045 17.7838 17 15.5 17C13.2162 17 11.0259 16.1045 9.41102 14.5104C7.79613 12.9163 6.88889 10.7543 6.88889 8.5C6.88889 6.24566 7.79613 4.08365 9.41102 2.48959C11.0259 0.895533 13.2162 0 15.5 0ZM15.5 3.4C14.8215 3.4 14.1497 3.53192 13.5228 3.78821C12.896 4.04451 12.3264 4.42018 11.8466 4.89376C11.3668 5.36733 10.9863 5.92955 10.7266 6.54831C10.467 7.16708 10.3333 7.83026 10.3333 8.5C10.3333 9.16974 10.467 9.83293 10.7266 10.4517C10.9863 11.0704 11.3668 11.6327 11.8466 12.1062C12.3264 12.5798 12.896 12.9555 13.5228 13.2118C14.1497 13.4681 14.8215 13.6 15.5 13.6C16.8703 13.6 18.1844 13.0627 19.1534 12.1062C20.1223 11.1498 20.6667 9.8526 20.6667 8.5C20.6667 7.1474 20.1223 5.85019 19.1534 4.89376C18.1844 3.93732 16.8703 3.4 15.5 3.4Z" fill="black" /></svg>
           </Link>
           <button
             onClick={() => {

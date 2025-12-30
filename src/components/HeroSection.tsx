@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const platforms = [
   { value: '', label: 'All platforms' },
@@ -25,6 +25,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
   );
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setSelectedPlatform(platforms.find(p => p.value === initialPlatformValue) || platforms[0]);
@@ -41,6 +42,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
   const handleSelectPlatform = (platform: { value: string; label: string }) => {
     setSelectedPlatform(platform);
     setIsDropdownOpen(false);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (searchQuery) params.append('q', searchQuery);
+    if (selectedPlatform.value) params.append('pf', selectedPlatform.value);
+    navigate(`/search?${params.toString()}`);
   };
 
   useEffect(() => {
@@ -67,7 +76,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
           Search by category or username and filter results to find the exact creators you need.
         </p>
 
-        <form action="/search" method="GET" className="w-full max-w-lg md:max-w-4xl my-5 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 overflow-visible relative z-20">
+        <form onSubmit={handleSubmit} className="w-full max-w-lg md:max-w-4xl my-5 bg-white rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-gray-100 overflow-visible relative z-20">
           <div className="flex flex-col md:flex-row">
             <div className="relative flex-grow border-b md:border-b-0 md:border-r border-gray-100 z-10">
               <div className="absolute inset-y-0 left-0 pl-5 flex items-center pointer-events-none">
@@ -75,7 +84,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
               </div>
               <input
                 type="text"
-                name="q"
                 className="block w-full pl-12 pr-5 py-3 md:py-5 text-gray-900 placeholder-gray-400 focus:outline-none text-base font-medium md:placeholder:text-base placeholder:text-sm placeholder:font-normal bg-transparent"
                 placeholder="Search by category (eg. 'tech', 'finance')"
                 value={searchQuery}
@@ -84,7 +92,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
             </div>
 
             <div className="relative md:w-64 border-b md:border-b-0 z-30" ref={dropdownRef}>
-              <input type="hidden" name="pf" value={selectedPlatform.value} />
               <button
                 type="button"
                 onClick={toggleDropdown}

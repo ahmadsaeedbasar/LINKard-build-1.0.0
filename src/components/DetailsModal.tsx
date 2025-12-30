@@ -53,7 +53,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
             <div className="text-right">
               <div className="text-2xl font-bold text-gray-900">{profile.followers}</div>
               <div className="text-xs text-gray-500 uppercase tracking-wide">
-                {profile.platform === 'linkedin' ? 'Connections' : 'Followers'}
+                {profile.platform === 'linkedin' ? 'Connections' : 'Subscribers'}
               </div>
             </div>
           </div>
