@@ -12,6 +12,8 @@ import SignupInfluencer from "./pages/SignupInfluencer";
 import SignupClient from "./pages/SignupClient";
 import CreatorProfile from "./pages/CreatorProfile";
 import AnalyticsProvider from "./components/AnalyticsProvider";
+import { AuthProvider } from "./context/AuthContext";
+import { ProfileProvider } from "./context/ProfileContext";
 
 const queryClient = new QueryClient();
 
@@ -21,19 +23,22 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AnalyticsProvider>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/accounts/login" element={<Login />} />
-            <Route path="/accounts/signup" element={<Signup />} />
-            <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
-            <Route path="/accounts/signup/client" element={<SignupClient />} />
-            <Route path="/:handle" element={<CreatorProfile />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AnalyticsProvider>
+        <AuthProvider>
+          <ProfileProvider>
+            <AnalyticsProvider>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/search" element={<Search />} />
+                <Route path="/accounts/login" element={<Login />} />
+                <Route path="/accounts/signup" element={<Signup />} />
+                <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
+                <Route path="/accounts/signup/client" element={<SignupClient />} />
+                <Route path="/:handle" element={<CreatorProfile />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </AnalyticsProvider>
+          </ProfileProvider>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

@@ -1,14 +1,16 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import HireModal from '@/components/HireModal';
 import { featuredProfiles } from '@/data/featuredProfiles';
 import { BadgeCheck, MapPin, Globe, Mail, Instagram, Youtube, Twitter, ExternalLink } from 'lucide-react';
 
 const CreatorProfile = () => {
   const { handle } = useParams();
+  const [isHireModalOpen, setIsHireModalOpen] = useState(false);
   const decodedHandle = handle?.startsWith('@') ? handle : `@${handle}`;
   const profile = featuredProfiles.find(p => p.profileLink === decodedHandle);
 
@@ -47,7 +49,10 @@ const CreatorProfile = () => {
                 <p className="text-gray-500 font-medium">{profile.profileLink}</p>
               </div>
               <div className="flex gap-2 md:mb-2">
-                <button className="px-6 py-2.5 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-lg">
+                <button 
+                  onClick={() => setIsHireModalOpen(true)}
+                  className="px-6 py-2.5 bg-black text-white rounded-xl font-bold hover:bg-gray-800 transition-colors shadow-lg active:scale-95"
+                >
                   Hire Creator
                 </button>
               </div>
@@ -77,7 +82,7 @@ const CreatorProfile = () => {
               <p className="text-gray-600 leading-relaxed text-lg">
                 Professional {profile.category} creator based in {profile.location}. 
                 Specializing in {profile.contentType} content with a total reach of over {profile.followers} on {profile.platformLabel}.
-                I focus on creating high-quality, authentic content that resonates with my community and drives real engagement for brand partners.
+                I focus on creating high-quality, authentic content that resonates with my community.
               </p>
             </section>
 
@@ -136,6 +141,12 @@ const CreatorProfile = () => {
         </div>
       </main>
       <Footer />
+
+      <HireModal 
+        isOpen={isHireModalOpen} 
+        onClose={() => setIsHireModalOpen(false)} 
+        creatorName={profile.name} 
+      />
     </div>
   );
 };

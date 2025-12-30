@@ -1,20 +1,20 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Search as SearchIcon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search as SearchIcon, LogOut, User as UserIcon } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAuth } from '@/context/AuthContext';
 
 const Header = () => {
   const [showNavbar, setShowNavbar] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
-  const disableNavbarHide = false;
   const { sendEvent } = useAnalytics();
+  const { user, logout, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
-      if (disableNavbarHide) return;
-
       const currentScroll = window.pageYOffset;
       if (currentScroll > lastScrollY && currentScroll > 50) {
         setShowNavbar(false);
@@ -26,7 +26,12 @@ const Header = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY, disableNavbarHide]);
+  }, [lastScrollY]);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   const handleLinkClick = (linkId: string, url: string, context: string, text: string) => {
     sendEvent('/api/a/l1/', {
@@ -41,17 +46,15 @@ const Header = () => {
     <header
       className={`fixed top-0 left-0 right-0 z-40 w-full bg-white/90 backdrop-blur-md border-b border-gray-100 transition-transform duration-300 ease-in-out ${
         showNavbar ? 'translate-y-0' : '-translate-y-full'
-      } ${disableNavbarHide ? 'translate-y-0' : ''}`}
-      data-navbar-fixed={disableNavbarHide}
+      }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16 md:h-20">
-          {/* Logo */}
           <div className="flex-shrink-0 flex items-center z-40">
             <Link
-              to="/search"
+              to="/"
               className="flex items-center gap-2 group"
-              onClick={() => handleLinkClick('header_logo_link', '/search', 'navigation', 'ProOmo Logo')}
+              onClick={() => handleLinkClick('header_logo_link', '/', 'navigation', 'ProOmo Logo')}
             >
               <svg className="w-9 h-9 md:w-10 md:h-10" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="220" height="220" rx="50" fill="black" />
@@ -73,7 +76,6 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* DESKTOP MENU (MD+) */}
           <nav className="hidden md:flex items-center gap-8">
             <Link
               to="/search"
@@ -82,40 +84,50 @@ const Header = () => {
             >
               Find Talent
             </Link>
-            <div className="flex items-center gap-4">
-              <Link
-                to="/accounts/login"
-                className="text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors"
-                onClick={() => handleLinkClick('login_link', '/accounts/login', 'authentication', 'Log in')}
-              >
-                Log in
-              </Link>
-              <Link
-                to="/accounts/signup"
-                className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-xl text-white bg-black hover:bg-gray-800 transition-all shadow-sm hover:shadow hover:-translate-y-0.5"
-                onClick={() => handleLinkClick('join_now_desktop_link', '/accounts/signup', 'authentication', 'Join Now')}
-              >
-                Join Now
-              </Link>
-            </div>
+            
+            {isAuthenticated ? (
+              <div className="flex items-center gap-6">
+                <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                  <UserIcon className="w-4 h-4" />
+                  {user?.name}
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 text-sm font-medium text-red-600 hover:text-red-700"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4">
+                <Link
+                  to="/accounts/login"
+                  className="text-sm font-semibold text-gray-900 hover:text-gray-600 transition-colors"
+                  onClick={() => handleLinkClick('login_link', '/accounts/login', 'authentication', 'Log in')}
+                >
+                  Log in
+                </Link>
+                <Link
+                  to="/accounts/signup"
+                  className="inline-flex items-center justify-center px-5 py-2.5 border border-transparent text-sm font-bold rounded-xl text-white bg-black hover:bg-gray-800 transition-all shadow-sm hover:shadow hover:-translate-y-0.5"
+                  onClick={() => handleLinkClick('join_now_desktop_link', '/accounts/signup', 'authentication', 'Join Now')}
+                >
+                  Join Now
+                </Link>
+              </div>
+            )}
           </nav>
 
-          {/* MOBILE MENU (Hidden on Desktop) */}
           <div className="flex items-center gap-3 md:hidden">
-            <Link
-              to="/search"
-              className="p-2 text-gray-500 hover:text-black transition-colors"
-              onClick={() => handleLinkClick('search_icon_mobile', '/search', 'navigation', 'Search Icon')}
-            >
+            <Link to="/search" className="p-2 text-gray-500 hover:text-black transition-colors">
               <SearchIcon className="w-6 h-6" />
             </Link>
-            <Link
-              to="/accounts/signup"
-              className="bg-black text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm"
-              onClick={() => handleLinkClick('join_now_mobile_link', '/accounts/signup', 'authentication', 'Join Now')}
-            >
-              Join Now
-            </Link>
+            {!isAuthenticated && (
+              <Link to="/accounts/signup" className="bg-black text-white px-4 py-2 rounded-xl text-sm font-bold shadow-sm">
+                Join Now
+              </Link>
+            )}
           </div>
         </div>
       </div>
