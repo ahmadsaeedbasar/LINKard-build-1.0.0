@@ -15,6 +15,7 @@ import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import EditProfile from "./pages/EditProfile";
 import AnalyticsProvider from "./components/AnalyticsProvider";
+import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { ProfileProvider } from "./context/ProfileContext";
 import { InquiryProvider } from "./context/InquiryContext";
@@ -38,9 +39,12 @@ const App = () => (
                   <Route path="/accounts/signup" element={<Signup />} />
                   <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
                   <Route path="/accounts/signup/client" element={<SignupClient />} />
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/analytics" element={<Analytics />} />
-                  <Route path="/settings/profile" element={<EditProfile />} />
+                  
+                  {/* Private Routes */}
+                  <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                  <Route path="/analytics" element={<ProtectedRoute><Analytics /></ProtectedRoute>} />
+                  <Route path="/settings/profile" element={<ProtectedRoute><EditProfile /></ProtectedRoute>} />
+                  
                   <Route path="/:handle" element={<CreatorProfile />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
