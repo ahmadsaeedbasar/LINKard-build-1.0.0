@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search as SearchIcon } from 'lucide-react'; // Renamed to avoid conflict with Search page
+import { Search as SearchIcon } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';
 
 const Header = () => {
