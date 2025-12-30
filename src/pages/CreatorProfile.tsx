@@ -39,6 +39,14 @@ const CreatorProfile = () => {
     );
   }
 
+  const getReachLabel = (platform: string) => {
+    switch (platform) {
+      case 'linkedin': return 'Connections';
+      case 'youtube': return 'Subscribers';
+      default: return 'Followers';
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-50 text-gray-900">
       <Header />
@@ -100,7 +108,7 @@ const CreatorProfile = () => {
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
                   <div className="text-3xl font-extrabold text-black">{profile.followers_count || '0'}</div>
-                  <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">Total Reach</div>
+                  <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">{getReachLabel(profile.platform)}</div>
                 </div>
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
                   <div className="text-3xl font-extrabold text-black">{profile.start_price || 'Quote'}</div>

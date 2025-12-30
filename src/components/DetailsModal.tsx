@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import { X, BadgeCheck } from 'lucide-react';
+import { X, BadgeCheck, Tag } from 'lucide-react'; // Added Tag icon
 import { Profile } from '@/types/profile'; // Updated import
 
 interface DetailsModalProps {
@@ -26,8 +26,22 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
 
   if (!isOpen) return null;
 
+  const getReachLabel = (platform: string) => {
+    switch (platform) {
+      case 'linkedin': return 'Connections';
+      case 'youtube': return 'Subscribers';
+      default: return 'Followers';
+    }
+  };
+
+  const formatPrice = (price: string) => {
+    const num = parseFloat(price.replace(/[^0-9.-]+/g,""));
+    if (isNaN(num)) return price;
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+  };
+
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 h-full w-full z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 backdrop-blur-sm h-full w-full z-50 flex items-center justify-center p-4">
       <div ref={modalRef} className="relative w-11/12 md:w-3/4 lg:max-w-md shadow-lg rounded-md bg-white max-h-[85vh] overflow-y-auto">
         <div className="p-6">
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600 w-full flex justify-end mb-2">
@@ -53,7 +67,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
             <div className="text-right">
               <div className="text-2xl font-bold text-gray-900">{profile.followers_count}</div>
               <div className="text-xs text-gray-500 uppercase tracking-wide">
-                {profile.platform === 'linkedin' ? 'Connections' : 'Subscribers'}
+                {getReachLabel(profile.platform)}
               </div>
             </div>
           </div>
@@ -66,7 +80,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
             </div>
             <div className="text-center bg-gray-50 rounded-lg px-3 py-3">
               <div className="text-xs text-gray-500 uppercase tracking-wide">Base Price</div>
-              <div className="text-sm font-semibold text-gray-900">{profile.start_price}</div>
+              <div className="text-sm font-semibold text-gray-900">{formatPrice(profile.start_price)}</div>
             </div>
           </div>
 

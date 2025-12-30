@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, MapPin, ExternalLink } from 'lucide-react';
+import { BadgeCheck, MapPin, ExternalLink, Tag } from 'lucide-react'; // Added Tag icon
 import { useAnalytics } from '@/hooks/useAnalytics';
 import { Profile } from '@/types/profile'; // Updated import
 
@@ -24,6 +24,14 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
       case 'facebook': return 'bg-blue-50 text-blue-700 border-blue-100';
       case 'tiktok': return 'bg-gray-50 text-gray-900 border-gray-200';
       default: return 'bg-gray-50 text-gray-700 border-gray-200';
+    }
+  };
+
+  const getReachLabel = (platform: string) => {
+    switch (platform) {
+      case 'linkedin': return 'Connections';
+      case 'youtube': return 'Subscribers';
+      default: return 'Followers';
     }
   };
 
@@ -68,6 +76,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
             </div>
             <div className="flex gap-2 mt-1.5">
               <div className="flex items-center text-sm text-gray-600">
+                <Tag className="w-4 h-4 mr-1 stroke-gray-400" /> {/* Added Tag icon for category */}
                 <span className="truncate font-medium">{profile.category}</span>
               </div>
               <div className="flex items-center text-sm text-gray-600">
@@ -82,7 +91,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
           <div className="flex flex-col">
             <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.followers_count}</span>
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
-              Reach
+              {getReachLabel(profile.platform)}
             </span>
           </div>
           <div className="h-8 w-px bg-gray-200"></div>
