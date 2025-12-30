@@ -1,51 +1,65 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: 'influencer' | 'client';
-  name: string;
-}
+import { supabase } from '@/integrations/supabase/client';
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, role: 'influencer' | 'client') => void;
-  logout: () => void;
-  isAuthenticated: boolean;
+  profile: any | null;
+  session: Session | null;
+  isLoading: boolean;
+  signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [profile, setProfile] = useState<any | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('mock_user');
-    if (savedUser) setUser(JSON.parse(savedUser));
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) fetchProfile(session.user.id);
+      setIsLoading(false);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const login = (email: string, role: 'influencer' | 'client') => {
-    const mockUser: User = {
-      id: Math.random().toString(36).substr(2, 9),
-      email,
-      username: email.split('@')[0],
-      role,
-      name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
-    };
-    setUser(mockUser);
-    localStorage.setItem('mock_user', JSON.stringify(mockUser));
+  const fetchProfile = async (userId: string) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+    
+    if (!error) setProfile(data);
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('mock_user');
+  const signOut = async () => {
+    await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
+    <AuthContext.Provider value={{ user, profile, session, isLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
