@@ -97,5 +97,80 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
   }
+}
+
+@layer utilities {
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    user-select: none;
+    cursor: grab;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .fs-2 {
+    font-size: 2rem;
+  }
+}
+
+/* Platform Gradients */
+.platform-x {
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+}
+
+.platform-instagram {
+    background: linear-gradient(135deg, #833ab4 0%, #fd1d1d 50%, #fcb045 100%);
+}
+
+.platform-linkedin {
+    background: linear-gradient(135deg, #0077b5 0%, #0a66c2 100%);
+}
+
+.platform-youtube {
+    background: linear-gradient(135deg, #ff0000 0%, #cc0000 100%);
+}
+
+.platform-tiktok {
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+}
+
+.platform-facebook {
+    background: linear-gradient(135deg, #1877f2 0%, #0d5cb6 100%);
+}
+
+.platform-threads {
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+}
+
+.platform-other {
+    background: linear-gradient(135deg, #4b5563 0%, #1f2937 100%);
+}
+
+.avatar-outline {
+    box-shadow: 0 0 0 4px #fff;
+}
+
+/* Infinite Animation */
+@keyframes scroll {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-scroll {
+    animation: scroll 35s linear infinite;
+}
+
+.animate-scroll:hover {
+    animation-play-state: paused;
 }
