@@ -7,7 +7,7 @@ const FeaturesSection = () => {
     <section className="py-8 md:py-12">
       <div className="max-w-7xl mx-auto md:py-12 sm:px-6 lg:px-8">
         <div className="flex flex-col justify-between items-start mb-4">
-          <h2 className="text-3xl font-bold text-gray-900">Why brands choose ProOmo</h2>
+          <h2 className="text-3xl font-bold text-gray-900">Why brands choose LINKard</h2>
           <p className="text-gray-600 text-lg">We provide the infrastructure to make data-backed decisions.</p>
         </div>
 
