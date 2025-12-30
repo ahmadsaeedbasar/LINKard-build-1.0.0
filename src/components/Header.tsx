@@ -54,7 +54,7 @@ const Header = () => {
                   </linearGradient>
                 </defs>
               </svg>
-              <span className="text-xl font-bold tracking-tight text-gray-900">ProOmo</span>
+              <span className="text-xl font-bold tracking-tight text-gray-900">LINKard</span>
             </Link>
           </div>
 
