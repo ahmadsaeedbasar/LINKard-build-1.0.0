@@ -3,7 +3,6 @@
 import React from 'react';
 
 const LogoMarquee = () => {
-  // Logos are duplicated to create a seamless infinite scroll effect
   const logos = [
     { src: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg", alt: "Instagram" },
     { src: "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Logo_de_Facebook.png/1028px-Logo_de_Facebook.png", alt: "Facebook" },
@@ -26,15 +25,10 @@ const LogoMarquee = () => {
         <div className="absolute right-0 top-0 bottom-0 w-12 md:w-24 z-10 bg-gradient-to-l from-gray-100 to-transparent"></div>
 
         <div className="flex justify-center">
-          {/* Inner Container for Logos (Original + Duplicated for seamless scroll) */}
-          <div className="flex gap-8 animate-scroll whitespace-nowrap">
-            {/* Original set of logos */}
+          {/* Inner Container for Logos (Original) */}
+          <div className="flex gap-8 overflow-x-auto no-scrollbar cursor-grab">
             {logos.map((logo, index) => (
               <img key={`original-${index}`} src={logo.src} className="h-8 md:h-10 w-auto flex-shrink-0 rounded" alt={logo.alt} />
-            ))}
-            {/* Duplicated set of logos for seamless loop */}
-            {logos.map((logo, index) => (
-              <img key={`duplicate-${index}`} src={logo.src} className="h-8 md:h-10 w-auto flex-shrink-0 rounded" alt={logo.alt} />
             ))}
           </div>
         </div>

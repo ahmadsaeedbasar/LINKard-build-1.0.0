@@ -84,6 +84,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
               </div>
               <input
                 type="text"
+                name="q"
                 className="block w-full pl-12 pr-5 py-3 md:py-5 text-gray-900 placeholder-gray-400 focus:outline-none text-base font-medium md:placeholder:text-base placeholder:text-sm placeholder:font-normal bg-transparent"
                 placeholder="Search by category (eg. 'tech', 'finance')"
                 value={searchQuery}
@@ -92,6 +93,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ initialQuery = '', initialPla
             </div>
 
             <div className="relative md:w-64 border-b md:border-b-0 z-30" ref={dropdownRef}>
+              <input type="hidden" name="pf" id="platform-value" value={selectedPlatform.value} />
               <button
                 type="button"
                 onClick={toggleDropdown}

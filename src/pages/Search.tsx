@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
@@ -19,6 +19,19 @@ const Search = () => {
 
   const { data: profiles, isLoading } = useProfilesData(query, platform);
   const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+  const [flashMessage, setFlashMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!query && !platform) {
+      setFlashMessage('Please enter a search term to find influencers.');
+      const timer = setTimeout(() => {
+        setFlashMessage(null);
+      }, 4000); // Auto-hide after 4 seconds
+      return () => clearTimeout(timer);
+    } else {
+      setFlashMessage(null);
+    }
+  }, [query, platform]);
 
   const selectedProfile = profiles?.find((p): p is Profile => p.id === selectedProfileId); // Explicitly type selectedProfile
 
@@ -26,6 +39,14 @@ const Search = () => {
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
       <Header />
       <main className="flex-grow w-full max-w-7xl mx-auto px-4 my-4 sm:px-6 lg:px-8 z-0 relative">
+        {flashMessage && (
+          <div className="flex flex-col gap-3 mt-3">
+            <div className="message-item flex items-center p-4 rounded-xl bg-yellow-50 text-yellow-800">
+              <div className="text-sm font-medium">{flashMessage}</div>
+            </div>
+          </div>
+        )}
+
         <HeroSection initialQuery={query} initialPlatformValue={platform} />
         <LogoMarquee />
 
