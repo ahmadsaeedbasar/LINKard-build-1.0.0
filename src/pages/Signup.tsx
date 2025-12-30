@@ -17,13 +17,13 @@ const Signup = () => {
           </div>
           <div className="grid gap-3">
             <Link 
-              className="w-full px-4 py-3 rounded-md border bg-white text-center font-medium hover:bg-gray-50 transition-colors" 
+              className="w-full px-4 py-3 rounded-md border bg-white text-center hover:bg-gray-50 transition-colors" 
               to="/accounts/signup/influencer"
             >
               Sign up as Influencer
             </Link>
             <Link 
-              className="w-full px-4 py-3 rounded-md border bg-white text-center font-medium hover:bg-gray-50 transition-colors" 
+              className="w-full px-4 py-3 rounded-md border bg-white text-center hover:bg-gray-50 transition-colors" 
               to="/accounts/signup/client"
             >
               Sign up as Client
@@ -31,7 +31,7 @@ const Signup = () => {
           </div>
           <p className="text-sm text-gray-600 mt-6 text-center">
             Already have an account?{' '}
-            <Link className="text-black font-bold underline" to="/accounts/login">Log in</Link>
+            <Link className="text-black underline" to="/accounts/login">Log in</Link>
           </p>
         </div>
       </main>
