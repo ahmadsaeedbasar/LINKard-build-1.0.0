@@ -8,6 +8,8 @@ import NotFound from "./pages/NotFound";
 import Search from "./pages/Search";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import SignupInfluencer from "./pages/SignupInfluencer";
+import SignupClient from "./pages/SignupClient";
 import CreatorProfile from "./pages/CreatorProfile";
 import AnalyticsProvider from "./components/AnalyticsProvider";
 
@@ -25,6 +27,8 @@ const App = () => (
             <Route path="/search" element={<Search />} />
             <Route path="/accounts/login" element={<Login />} />
             <Route path="/accounts/signup" element={<Signup />} />
+            <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
+            <Route path="/accounts/signup/client" element={<SignupClient />} />
             <Route path="/:handle" element={<CreatorProfile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

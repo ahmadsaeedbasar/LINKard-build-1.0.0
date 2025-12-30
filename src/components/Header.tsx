@@ -51,7 +51,7 @@ const Header = () => {
             <Link
               to="/search"
               className="flex items-center gap-2 group"
-              onClick={() => handleLinkClick('header_logo_link', '/search', 'navigation', 'LINKard Logo')}
+              onClick={() => handleLinkClick('header_logo_link', '/search', 'navigation', 'ProOmo Logo')}
             >
               <svg className="w-9 h-9 md:w-10 md:h-10" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <rect width="220" height="220" rx="50" fill="black" />
@@ -69,7 +69,7 @@ const Header = () => {
                   </linearGradient>
                 </defs>
               </svg>
-              <span className="text-xl font-bold tracking-tight text-gray-900">LINKard</span>
+              <span className="text-xl font-bold tracking-tight text-gray-900">ProOmo</span>
             </Link>
           </div>
 
