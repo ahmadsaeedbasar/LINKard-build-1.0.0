@@ -9,18 +9,22 @@ import DetailsModal from '@/components/DetailsModal';
 import FeaturesSection from '@/components/FeaturesSection';
 import CallToActionSection from '@/components/CallToActionSection';
 import Footer from '@/components/Footer';
-import { featuredProfiles } from '@/data/featuredProfiles';
+import { useFeaturedProfiles } from '@/hooks/useProfilesData';
+import { Loader2 } from 'lucide-react';
 
 const Index = () => {
-  const [openModalId, setOpenModalId] = useState<string | null>(null);
+  const { data: profiles, isLoading } = useFeaturedProfiles();
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
 
   const handleOpenDetailsModal = (profileId: string) => {
-    setOpenModalId(profileId);
+    setSelectedProfileId(profileId);
   };
 
   const handleCloseDetailsModal = () => {
-    setOpenModalId(null);
+    setSelectedProfileId(null);
   };
+
+  const selectedProfile = profiles?.find(p => p.id === selectedProfileId);
 
   return (
     <div className="min-h-screen flex flex-col antialiased pt-16 md:pt-20 bg-gray-100 text-gray-900">
@@ -38,11 +42,38 @@ const Index = () => {
                 <p className="text-gray-500 mt-1">Verified creators ready for collaboration.</p>
               </div>
 
-              <div id="creators-scroll" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {featuredProfiles.map((profile) => (
-                  <SocialCard key={profile.id} profile={profile} onOpenDetails={handleOpenDetailsModal} />
-                ))}
-              </div>
+              {isLoading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                <div id="creators-scroll" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {profiles && profiles.length > 0 ? (
+                    profiles.map((profile) => (
+                      <SocialCard 
+                        key={profile.id} 
+                        profile={{
+                          ...profile,
+                          platformLabel: profile.platform_label,
+                          platformColorClass: profile.platform_color_class,
+                          profileImage: profile.avatar_url || '/placeholder.svg',
+                          isVerified: profile.is_verified,
+                          followers: profile.followers_count,
+                          startPrice: profile.start_price,
+                          availableSpaces: profile.available_spaces || [],
+                          profileLink: `@${profile.username}`,
+                          socialLink: profile.social_link || '#'
+                        }} 
+                        onOpenDetails={handleOpenDetailsModal} 
+                      />
+                    ))
+                  ) : (
+                    <div className="col-span-full py-12 text-center bg-white rounded-3xl border border-dashed border-gray-300">
+                      <p className="text-gray-500">No featured profiles found.</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </section>
 
@@ -52,14 +83,24 @@ const Index = () => {
       </main>
       <Footer />
 
-      {featuredProfiles.map((profile) => (
+      {selectedProfile && (
         <DetailsModal
-          key={profile.id}
-          profile={profile}
-          isOpen={openModalId === profile.id}
+          profile={{
+            ...selectedProfile,
+            platformLabel: selectedProfile.platform_label,
+            platformColorClass: selectedProfile.platform_color_class,
+            profileImage: selectedProfile.avatar_url || '/placeholder.svg',
+            isVerified: selectedProfile.is_verified,
+            followers: selectedProfile.followers_count,
+            startPrice: selectedProfile.start_price,
+            availableSpaces: selectedProfile.available_spaces || [],
+            profileLink: `@${selectedProfile.username}`,
+            socialLink: selectedProfile.social_link || '#'
+          }}
+          isOpen={!!selectedProfileId}
           onClose={handleCloseDetailsModal}
         />
-      ))}
+      )}
     </div>
   );
 };
