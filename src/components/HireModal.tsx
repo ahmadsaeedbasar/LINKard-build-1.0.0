@@ -3,21 +3,29 @@
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
+import { useInquiries } from '@/context/InquiryContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface HireModalProps {
+  creatorId: string;
   creatorName: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const HireModal: React.FC<HireModalProps> = ({ creatorName, isOpen, onClose }) => {
+const HireModal: React.FC<HireModalProps> = ({ creatorId, creatorName, isOpen, onClose }) => {
   const [message, setMessage] = useState('');
+  const { sendInquiry } = useInquiries();
+  const { user } = useAuth();
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const brandName = user?.name || 'Anonymous Brand';
+    sendInquiry(creatorId, brandName, message);
     showSuccess(`Inquiry sent to ${creatorName}!`);
+    setMessage('');
     onClose();
   };
 
@@ -46,7 +54,7 @@ const HireModal: React.FC<HireModalProps> = ({ creatorName, isOpen, onClose }) =
             
             <div className="bg-blue-50 p-4 rounded-2xl mb-4">
               <p className="text-sm text-blue-700 leading-relaxed">
-                <strong>ProTip:</strong> Creators are 3x more likely to respond when you include specific dates and budget ranges.
+                <strong>ProTip:</strong> Creators respond faster when you include specific dates and budget ranges.
               </p>
             </div>
 

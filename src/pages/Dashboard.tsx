@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
+import { useInquiries } from '@/context/InquiryContext';
 import { 
   BarChart3, 
   Users, 
@@ -17,18 +18,13 @@ import {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { inquiries } = useInquiries();
 
   const stats = [
     { label: 'Total Reach', value: '45.2k', icon: Users, change: '+12%', color: 'text-blue-600' },
     { label: 'Avg. Engagement', value: '5.8%', icon: TrendingUp, change: '+0.4%', color: 'text-emerald-600' },
     { label: 'Profile Views', value: '1,284', icon: Eye, change: '+18%', color: 'text-purple-600' },
-    { label: 'New Inquiries', value: '7', icon: MessageSquare, change: '3 new', color: 'text-orange-600' },
-  ];
-
-  const recentInquiries = [
-    { brand: 'EcoStyles', budget: '$500 - $800', date: '2 hours ago', status: 'New' },
-    { brand: 'TechGear Pro', budget: '$1,200', date: 'Yesterday', status: 'Pending' },
-    { brand: 'Nomad Travels', budget: '$350', date: '3 days ago', status: 'Read' },
+    { label: 'New Inquiries', value: inquiries.length.toString(), icon: MessageSquare, change: `${inquiries.filter(i => i.status === 'new').length} new`, color: 'text-orange-600' },
   ];
 
   return (
@@ -45,10 +41,10 @@ const Dashboard = () => {
               <BarChart3 className="w-4 h-4" />
               View Analytics
             </Link>
-            <button className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors">
+            <Link to="/settings/profile" className="flex items-center gap-2 px-4 py-2 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-colors">
               <Settings className="w-4 h-4" />
               Edit Profile
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -71,38 +67,41 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Recent Inquiries */}
           <div className="lg:col-span-2 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <h2 className="text-xl font-bold">Recent Inquiries</h2>
-              <button className="text-sm font-bold text-gray-500 hover:text-black transition-colors">View All</button>
             </div>
             <div className="divide-y divide-gray-50">
-              {recentInquiries.map((inquiry, i) => (
-                <div key={i} className="p-6 hover:bg-gray-50 transition-colors flex items-center justify-between">
+              {inquiries.length > 0 ? inquiries.map((inquiry) => (
+                <div key={inquiry.id} className="p-6 hover:bg-gray-50 transition-colors flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-bold text-gray-600">
-                      {inquiry.brand[0]}
+                    <div className="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center font-bold">
+                      {inquiry.brandName[0]}
                     </div>
                     <div>
-                      <div className="font-bold text-gray-900">{inquiry.brand}</div>
-                      <div className="text-sm text-gray-500">{inquiry.date} • {inquiry.budget}</div>
+                      <div className="font-bold text-gray-900">{inquiry.brandName}</div>
+                      <div className="text-sm text-gray-500 line-clamp-1">{inquiry.message}</div>
+                      <div className="text-xs text-gray-400 mt-1">{inquiry.timestamp}</div>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      inquiry.status === 'New' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'
+                      inquiry.status === 'new' ? 'bg-blue-50 text-blue-600' : 'bg-gray-100 text-gray-600'
                     }`}>
                       {inquiry.status}
                     </span>
                     <ArrowUpRight className="w-5 h-5 text-gray-300" />
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="p-12 text-center text-gray-400">
+                  <MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-20" />
+                  <p>No inquiries yet. Keep sharing your profile!</p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Quick Actions / Tips */}
           <div className="space-y-6">
             <div className="bg-black text-white p-8 rounded-3xl shadow-lg relative overflow-hidden">
               <div className="relative z-10">
@@ -110,19 +109,10 @@ const Dashboard = () => {
                 <p className="text-gray-400 text-sm mb-4">
                   Updating your pricing and ad slots can increase your visibility to brands by up to 40%.
                 </p>
-                <button className="w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-100 transition-colors">
+                <Link to="/settings/profile" className="block w-full py-3 bg-white text-black rounded-xl font-bold hover:bg-gray-100 transition-colors text-center">
                   Update Slots
-                </button>
+                </Link>
               </div>
-              <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-gray-800 rounded-full opacity-50"></div>
-            </div>
-
-            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm">
-              <h3 className="font-bold mb-4">Profile Strength</h3>
-              <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden mb-2">
-                <div className="h-full bg-emerald-500 w-[85%]"></div>
-              </div>
-              <p className="text-xs text-gray-500">85% - Great! Add a case study to hit 100%.</p>
             </div>
           </div>
         </div>

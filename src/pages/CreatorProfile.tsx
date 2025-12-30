@@ -145,6 +145,7 @@ const CreatorProfile = () => {
       <HireModal 
         isOpen={isHireModalOpen} 
         onClose={() => setIsHireModalOpen(false)} 
+        creatorId={profile.id}
         creatorName={profile.name} 
       />
     </div>
