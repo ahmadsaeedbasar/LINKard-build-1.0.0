@@ -1,6 +1,4 @@
 {
   "name": "linkard",
-  "compatibility_date": "2024-01-01",
-  "pages_build_output_dir": "dist",
-  "account_id": "388c0293d8e789ec1c66a0a388077329"
+  "pages_build_output_dir": "dist"
 }
