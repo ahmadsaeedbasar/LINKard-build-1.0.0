@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search as SearchIcon, LogOut, User as UserIcon, LayoutDashboard } from 'lucide-react';
 import { useAnalytics } from '@/hooks/useAnalytics';

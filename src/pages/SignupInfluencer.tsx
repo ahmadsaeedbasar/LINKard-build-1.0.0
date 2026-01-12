@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { supabase } from '@/integrations/supabase/client'; // Import supabase
 import { showError, showSuccess } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
 
@@ -27,6 +28,14 @@ const SignupInfluencer = () => {
     bookingUrl: '',
     password: '',
     passwordConfirm: '',
+    category: 'Lifestyle', // New field
+    location: '', // New field
+    followersCount: '', // New field
+    startPrice: '', // New field
+    platform: '', // New field
+    platformLabel: '', // New field
+    platformColorClass: '', // New field
+    socialLink: '', // New field
   });
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImagePreviewUrl, setProfileImagePreviewUrl] = useState<string | null>(null);
@@ -67,14 +76,36 @@ const SignupInfluencer = () => {
       return false;
     }
 
-    // Database not available, assume available
-    setUsernameStatus({
-      checking: false,
-      available: true,
-      message: '✓ Database not available',
-      className: 'text-xs font-medium text-yellow-600',
-    });
-    return true;
+    try {
+      const { data, error } = await supabase
+        .from('profiles') // Changed to public.profiles
+        .select('username')
+        .eq('username', u.toLowerCase())
+        .maybeSingle();
+
+      if (error) {
+        // If error (likely due to RLS permissions), assume available to allow signup
+        setUsernameStatus({
+          checking: false,
+          available: true,
+          message: '✓ Assuming available',
+          className: 'text-xs font-medium text-emerald-600',
+        });
+        return true;
+      }
+
+      const isAvailable = !data;
+      setUsernameStatus({
+        checking: false,
+        available: isAvailable,
+        message: isAvailable ? '✓ Available' : '✗ Taken',
+        className: isAvailable ? 'text-xs font-medium text-emerald-600' : 'text-xs font-medium text-red-600',
+      });
+      return isAvailable;
+    } catch (e) {
+      setUsernameStatus({ checking: false, available: true, message: '✓ Assuming available', className: 'text-xs font-medium text-emerald-600' });
+      return true;
+    }
   }, []);
 
   const validateEmail = (v: string) => {
@@ -82,7 +113,7 @@ const SignupInfluencer = () => {
   };
 
   const updateFormValidation = useCallback(() => {
-    const { username, firstName, displayName, email, contactEmail, password, passwordConfirm } = formData;
+    const { username, firstName, displayName, email, contactEmail, password, passwordConfirm, followersCount, startPrice, platform } = formData;
 
     let reason = '';
     if (!username) reason = 'Enter username';
@@ -98,11 +129,14 @@ const SignupInfluencer = () => {
     else if (password.length < 8) reason = 'Password too short';
     else if (!passwordConfirm) reason = 'Confirm password';
     else if (password !== passwordConfirm) reason = 'Passwords don’t match';
+    else if (!followersCount || isNaN(Number(followersCount))) reason = 'Enter valid follower count';
+    else if (startPrice && isNaN(Number(startPrice))) reason = 'Enter valid base price';
+    else if (!platform) reason = 'Select a primary platform';
     
     return reason;
   }, [formData, usernameStatus]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
 
@@ -223,9 +257,13 @@ const SignupInfluencer = () => {
       return;
     }
 
-    // Insert profile data
+    // Parse numeric fields
+    const parsedFollowersCount = parseInt(formData.followersCount, 10);
+    const parsedStartPrice = formData.startPrice ? parseFloat(formData.startPrice) : null;
+
+    // Insert profile data into public.profiles
     const { error: profileError } = await supabase
-      .from('profiles')
+      .from('profiles') // Changed to public.profiles
       .insert({
         id: authData.user.id,
         username: formData.username.toLowerCase(),
@@ -233,6 +271,18 @@ const SignupInfluencer = () => {
         email: formData.email,
         role: 'influencer',
         bio: formData.bio,
+        contact_email: formData.contactEmail,
+        phone: formData.phone,
+        address: formData.address,
+        booking_url: formData.bookingUrl,
+        category: formData.category,
+        location: formData.location,
+        followers_count: parsedFollowersCount,
+        start_price: parsedStartPrice,
+        platform: formData.platform,
+        platform_label: formData.platformLabel || formData.platform, // Default label if not provided
+        platform_color_class: formData.platformColorClass || 'platform-other', // Default color class
+        social_link: formData.socialLink,
       });
 
     let profileInserted = false;
@@ -271,7 +321,7 @@ const SignupInfluencer = () => {
 
         // Update the profile with the avatar URL
         const { error: updateProfileError } = await supabase
-          .from('profiles')
+          .from('profiles') // Changed to public.profiles
           .update({ avatar_url: avatarUrl })
           .eq('id', authData.user.id);
 
@@ -444,6 +494,126 @@ const SignupInfluencer = () => {
                 onChange={handleInputChange}
               />
               <p className="text-xs text-gray-500 mt-1">Link to your Calendly, cal.com, etc. (Optional)</p>
+            </div>
+
+            {/* Influencer Specific Fields */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select 
+                  id="category"
+                  name="category"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  value={formData.category}
+                  onChange={handleInputChange}
+                >
+                  <option>Lifestyle</option>
+                  <option>Technology</option>
+                  <option>Travel</option>
+                  <option>Gaming</option>
+                  <option>Finance</option>
+                  <option>Beauty</option>
+                  <option>Food</option>
+                  <option>Fitness</option>
+                </select>
+              </div>
+              <div>
+                <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                <input
+                  id="location"
+                  name="location"
+                  type="text"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="e.g. New York, USA"
+                  value={formData.location}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label htmlFor="followersCount" className="block text-sm font-medium text-gray-700 mb-1">Followers Count *</label>
+                <input
+                  id="followersCount"
+                  name="followersCount"
+                  type="number"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  required
+                  value={formData.followersCount}
+                  onChange={handleInputChange}
+                />
+              </div>
+              <div>
+                <label htmlFor="startPrice" className="block text-sm font-medium text-gray-700 mb-1">Base Price (USD)</label>
+                <input
+                  id="startPrice"
+                  name="startPrice"
+                  type="number"
+                  step="0.01"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                  placeholder="e.g. 500.00"
+                  value={formData.startPrice}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label htmlFor="platform" className="block text-sm font-medium text-gray-700 mb-1">Primary Platform *</label>
+              <select 
+                id="platform"
+                name="platform"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                required
+                value={formData.platform}
+                onChange={(e) => {
+                  const selectedPlatform = e.target.value;
+                  let platformLabel = selectedPlatform;
+                  let platformColorClass = 'platform-other';
+
+                  switch (selectedPlatform) {
+                    case 'instagram': platformLabel = 'Instagram'; platformColorClass = 'platform-instagram'; break;
+                    case 'youtube': platformLabel = 'YouTube'; platformColorClass = 'platform-youtube'; break;
+                    case 'twitter': platformLabel = 'X / Twitter'; platformColorClass = 'platform-x'; break;
+                    case 'linkedin': platformLabel = 'LinkedIn'; platformColorClass = 'platform-linkedin'; break;
+                    case 'tiktok': platformLabel = 'TikTok'; platformColorClass = 'platform-tiktok'; break;
+                    case 'facebook': platformLabel = 'Facebook'; platformColorClass = 'platform-facebook'; break;
+                    case 'threads': platformLabel = 'Threads'; platformColorClass = 'platform-threads'; break;
+                  }
+
+                  setFormData(prev => ({
+                    ...prev,
+                    platform: selectedPlatform,
+                    platformLabel: platformLabel,
+                    platformColorClass: platformColorClass,
+                  }));
+                }}
+              >
+                <option value="">Select a platform</option>
+                <option value="instagram">Instagram</option>
+                <option value="youtube">YouTube</option>
+                <option value="twitter">X / Twitter</option>
+                <option value="linkedin">LinkedIn</option>
+                <option value="tiktok">TikTok</option>
+                <option value="facebook">Facebook</option>
+                <option value="threads">Threads</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="socialLink" className="block text-sm font-medium text-gray-700 mb-1">Social Profile Link</label>
+              <input
+                id="socialLink"
+                name="socialLink"
+                type="url"
+                className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
+                placeholder="https://instagram.com/yourprofile"
+                value={formData.socialLink}
+                onChange={handleInputChange}
+              />
+              <p className="text-xs text-gray-500 mt-1">Link to your primary social media profile.</p>
             </div>
             
             <div>

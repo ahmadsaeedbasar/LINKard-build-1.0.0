@@ -2,12 +2,12 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, MapPin, ExternalLink, Tag } from 'lucide-react'; // Added Tag icon
+import { BadgeCheck, MapPin, ExternalLink, Tag } from 'lucide-react';
 import { useAnalytics } from '../hooks/useAnalytics';
-import { Profile } from '../types/profile'; // Updated import
+import { Profile } from '../types/profile';
 
 interface SocialCardProps {
-  profile: Profile; // Updated type
+  profile: Profile;
   onOpenDetails: (profileId: string) => void;
 }
 
@@ -33,6 +33,18 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
       case 'youtube': return 'Subscribers';
       default: return 'Followers';
     }
+  };
+
+  const formatPrice = (price: number | null | undefined) => {
+    if (price === null || price === undefined) {
+      return 'N/A';
+    }
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+  };
+
+  const formatFollowers = (count: number | undefined) => {
+    if (count === undefined) return 'N/A';
+    return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(count);
   };
 
   const handleSocialClick = (eventType: string) => {
@@ -76,7 +88,7 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
             </div>
             <div className="flex gap-2 mt-1.5">
               <div className="flex items-center text-sm text-gray-600">
-                <Tag className="w-4 h-4 mr-1 stroke-gray-400" /> {/* Added Tag icon for category */}
+                <Tag className="w-4 h-4 mr-1 stroke-gray-400" />
                 <span className="truncate font-medium">{profile.category}</span>
               </div>
               <div className="flex items-center text-sm text-gray-600">
@@ -89,14 +101,14 @@ const SocialCard: React.FC<SocialCardProps> = ({ profile, onOpenDetails }) => {
 
         <div className="flex items-center justify-between mb-6 px-1">
           <div className="flex flex-col">
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.followers_count}</span>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">{formatFollowers(profile.followers_count)}</span>
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">
               {getReachLabel(profile.platform)}
             </span>
           </div>
           <div className="h-8 w-px bg-gray-200"></div>
           <div className="flex flex-col items-end">
-            <span className="text-2xl font-bold text-gray-900 tracking-tight">{profile.start_price}</span>
+            <span className="text-2xl font-bold text-gray-900 tracking-tight">{formatPrice(profile.start_price)}</span>
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wide">Base Rate</span>
           </div>
         </div>

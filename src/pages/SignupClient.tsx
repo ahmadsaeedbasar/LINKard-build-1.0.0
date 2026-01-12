@@ -70,7 +70,7 @@ const SignupClient = () => {
 
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('profiles') // Changed to public.profiles
         .select('username')
         .eq('username', u.toLowerCase())
         .maybeSingle();
@@ -246,9 +246,9 @@ const SignupClient = () => {
       return;
     }
 
-    // Insert profile data
+    // Insert profile data into public.profiles
     const { error: profileError } = await supabase
-      .from('profiles')
+      .from('profiles') // Changed to public.profiles
       .insert({
         id: authData.user.id,
         username: formData.username.toLowerCase(),
@@ -256,6 +256,10 @@ const SignupClient = () => {
         email: formData.email,
         role: 'client',
         bio: formData.bio,
+        contact_email: formData.contactEmail,
+        phone: formData.phone,
+        address: formData.address,
+        booking_url: formData.bookingUrl,
       });
 
     if (profileError) {
@@ -287,7 +291,7 @@ const SignupClient = () => {
 
         // Update the profile with the avatar URL
         const { error: updateProfileError } = await supabase
-          .from('profiles')
+          .from('profiles') // Changed to public.profiles
           .update({ avatar_url: avatarUrl })
           .eq('id', authData.user.id);
 

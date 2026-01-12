@@ -12,7 +12,6 @@ export interface Inquiry {
   status: string;
   created_at: string;
   sender_id: string;
-  sender_name?: string;
 }
 
 interface InquiryContextType {
@@ -39,7 +38,7 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Fetch inquiries received (as an influencer)
     const { data: received, error: receivedError } = await supabase
-      .from('interaction_management.inquiries')
+      .from('inquiries') // Changed to public.inquiries
       .select('*')
       .eq('creator_id', user.id)
       .order('created_at', { ascending: false });
@@ -48,7 +47,7 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Fetch inquiries sent (as a brand/client)
     const { data: sent, error: sentError } = await supabase
-      .from('interaction_management.inquiries')
+      .from('inquiries') // Changed to public.inquiries
       .select('*')
       .eq('sender_id', user.id)
       .order('created_at', { ascending: false });
@@ -60,14 +59,13 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) throw new Error("Must be logged in to send inquiry");
     
     const { error } = await supabase
-      .from('interaction_management.inquiries')
+      .from('inquiries') // Changed to public.inquiries
       .insert([
         {
           creator_id: creatorId,
           brand_name: brandName,
           message,
           sender_id: user.id,
-          sender_name: brandName
         }
       ]);
     
@@ -77,7 +75,7 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const markAsRead = async (id: string) => {
     const { error } = await supabase
-      .from('interaction_management.inquiries')
+      .from('inquiries') // Changed to public.inquiries
       .update({ status: 'read' })
       .eq('id', id);
     

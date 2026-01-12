@@ -1,7 +1,5 @@
 "use client";
 
-import React from 'react';
-
 const LogoMarquee = () => {
   const logos = [
     { src: "https://upload.wikimedia.org/wikipedia/commons/e/e7/Instagram_logo_2016.svg", alt: "Instagram" },

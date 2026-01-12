@@ -12,8 +12,8 @@ export interface Profile {
   role: string;
   category: string;
   location: string;
-  followers_count: string;
-  start_price: string | null; // Changed to allow null
+  followers_count: number;
+  start_price: number | null;
   platform: string;
   platform_label: string;
   platform_color_class: string;
@@ -26,4 +26,9 @@ export interface Profile {
   portfolio_items?: PortfolioItem[];
   created_at?: string;
   updated_at?: string;
+  email?: string; // Added email for client profiles
+  contact_email?: string;
+  phone?: string;
+  address?: string;
+  booking_url?: string;
 }

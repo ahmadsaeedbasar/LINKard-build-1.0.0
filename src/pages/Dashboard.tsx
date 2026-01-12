@@ -24,8 +24,13 @@ const Dashboard = () => {
   const isInfluencer = profile?.role === 'influencer';
   const inquiries = isInfluencer ? receivedInquiries : sentInquiries;
 
+  const formatFollowers = (count: number | undefined) => {
+    if (count === undefined) return '0';
+    return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(count);
+  };
+
   const creatorStats = [
-    { label: 'Total Reach', value: profile?.followers_count || '0', icon: Users, change: '+12%', color: 'text-blue-600' },
+    { label: 'Total Reach', value: formatFollowers(profile?.followers_count), icon: Users, change: '+12%', color: 'text-blue-600' },
     { label: 'Avg. Engagement', value: '5.8%', icon: TrendingUp, change: '+0.4%', color: 'text-emerald-600' },
     { label: 'Profile Views', value: '1,284', icon: Eye, change: '+18%', color: 'text-purple-600' },
     { label: 'New Inquiries', value: receivedInquiries.length.toString(), icon: MessageSquare, change: `${receivedInquiries.filter(i => i.status === 'new').length} new`, color: 'text-orange-600' },

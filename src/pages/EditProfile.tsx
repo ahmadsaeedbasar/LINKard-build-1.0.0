@@ -19,7 +19,7 @@ const EditProfile = () => {
     bio: '',
     category: 'Lifestyle',
     location: '',
-    startPrice: '',
+    startPrice: '', // Keep as string for input, convert to number for DB
   });
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const EditProfile = () => {
         bio: profile.bio || '',
         category: profile.category || 'Lifestyle',
         location: profile.location || '',
-        startPrice: profile.start_price || '',
+        startPrice: profile.start_price !== null && profile.start_price !== undefined ? profile.start_price.toString() : '',
       });
     }
   }, [profile]);
@@ -39,14 +39,22 @@ const EditProfile = () => {
     if (!user) return;
     
     setIsSaving(true);
+
+    const parsedStartPrice = formData.startPrice ? parseFloat(formData.startPrice) : null;
+    if (formData.startPrice && isNaN(parsedStartPrice as number)) {
+      showError("Start price must be a valid number.");
+      setIsSaving(false);
+      return;
+    }
+
     const { error } = await supabase
-      .from('user_management.profiles')
+      .from('profiles') // Changed to public.profiles
       .update({
         display_name: formData.displayName,
         bio: formData.bio,
         category: formData.category,
         location: formData.location,
-        start_price: formData.startPrice,
+        start_price: parsedStartPrice,
         updated_at: new Date().toISOString(),
       })
       .eq('id', user.id);
@@ -133,7 +141,7 @@ const EditProfile = () => {
                 <input
                   type="text"
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
-                  placeholder="e.g. $500"
+                  placeholder="e.g. 500.00"
                   value={formData.startPrice}
                   onChange={(e) => setFormData({...formData, startPrice: e.target.value})}
                 />

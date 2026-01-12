@@ -8,7 +8,7 @@ import HireModal from '@/components/HireModal';
 import PortfolioGallery from '@/components/PortfolioGallery';
 import { useProfileByHandle } from '@/hooks/useProfilesData';
 import { BadgeCheck, MapPin, Globe, Mail, Instagram, Youtube, Twitter, ExternalLink, Loader2 } from 'lucide-react';
-import { Profile } from '@/types/profile'; // Import Profile type
+import { Profile } from '@/types/profile';
 
 const CreatorProfile = () => {
   const { handle } = useParams();
@@ -45,6 +45,18 @@ const CreatorProfile = () => {
       case 'youtube': return 'Subscribers';
       default: return 'Followers';
     }
+  };
+
+  const formatPrice = (price: number | null | undefined) => {
+    if (price === null || price === undefined) {
+      return 'N/A';
+    }
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(price);
+  };
+
+  const formatFollowers = (count: number | undefined) => {
+    if (count === undefined) return 'N/A';
+    return new Intl.NumberFormat('en-US', { notation: 'compact', compactDisplay: 'short' }).format(count);
   };
 
   return (
@@ -107,11 +119,11 @@ const CreatorProfile = () => {
               <h2 className="text-xl font-bold mb-4">Channel Performance</h2>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
-                  <div className="text-3xl font-extrabold text-black">{profile.followers_count || '0'}</div>
+                  <div className="text-3xl font-extrabold text-black">{formatFollowers(profile.followers_count)}</div>
                   <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">{getReachLabel(profile.platform)}</div>
                 </div>
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">
-                  <div className="text-3xl font-extrabold text-black">{profile.start_price || 'Quote'}</div>
+                  <div className="text-3xl font-extrabold text-black">{formatPrice(profile.start_price)}</div>
                   <div className="text-xs text-gray-500 uppercase tracking-widest font-bold mt-1">Base Rate</div>
                 </div>
                 <div className="p-5 bg-gray-50 rounded-2xl text-center">

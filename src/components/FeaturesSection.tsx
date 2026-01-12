@@ -1,7 +1,5 @@
 "use client";
 
-import React from 'react';
-
 const FeaturesSection = () => {
   return (
     <section className="py-8 md:py-12">
