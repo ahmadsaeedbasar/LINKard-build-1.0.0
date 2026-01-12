@@ -31,8 +31,25 @@ const Login = () => {
 
     setIsLoading(true);
 
+    let emailToUse = usernameOrEmail;
+    if (!usernameOrEmail.includes('@')) {
+      // It's a username, lookup the email
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', usernameOrEmail.toLowerCase())
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        showError('Username not found');
+        setIsLoading(false);
+        return;
+      }
+      emailToUse = profile.email;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: usernameOrEmail, // Supabase signInWithPassword uses email
+      email: emailToUse,
       password,
     });
 
