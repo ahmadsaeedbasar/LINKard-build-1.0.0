@@ -14,6 +14,7 @@ import CreatorProfile from "./pages/CreatorProfile";
 import Dashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import EditProfile from "./pages/EditProfile";
+import OAuthConsent from "./pages/OAuthConsent";
 import AnalyticsProvider from "./components/AnalyticsProvider";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
@@ -38,6 +39,7 @@ const App = () => (
                 <Route path="/accounts/signup" element={<Signup />} />
                 <Route path="/accounts/signup/influencer" element={<SignupInfluencer />} />
                 <Route path="/accounts/signup/client" element={<SignupClient />} />
+                <Route path="/oauth/consent" element={<OAuthConsent />} />
                 
                 {/* Private Routes */}
                 <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
