@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import LogoMarquee from '@/components/LogoMarquee';
@@ -11,7 +11,7 @@ import CallToActionSection from '@/components/CallToActionSection';
 import Footer from '@/components/Footer';
 import { useFeaturedProfiles } from '@/hooks/useProfilesData';
 import { Loader2 } from 'lucide-react';
-import { Profile } from '@/types/profile'; // Import Profile type
+import type { Profile } from '@/types/profile'; // Import Profile type
 
 const Index = () => {
   const { data: profiles, isLoading } = useFeaturedProfiles();

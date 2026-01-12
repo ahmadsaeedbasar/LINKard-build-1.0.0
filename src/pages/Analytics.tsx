@@ -1,6 +1,5 @@
 "use client";
 
-import React from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { 
@@ -85,7 +84,7 @@ const Analytics = () => {
                     paddingAngle={5}
                     dataKey="value"
                   >
-                    {demographicData.map((entry, index) => (
+                    {demographicData.map((_, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -8,12 +8,12 @@ import HireModal from '@/components/HireModal';
 import PortfolioGallery from '@/components/PortfolioGallery';
 import { useProfileByHandle } from '@/hooks/useProfilesData';
 import { BadgeCheck, MapPin, Globe, Mail, Instagram, Youtube, Twitter, ExternalLink, Loader2 } from 'lucide-react';
-import { Profile } from '@/types/profile';
+import type { Profile } from '@/types/profile';
 
 const CreatorProfile = () => {
   const { handle } = useParams();
   const [isHireModalOpen, setIsHireModalOpen] = useState(false);
-  const { data: profile, isLoading } = useProfileByHandle(handle || '');
+  const { data: profile, isLoading }: { data?: Profile; isLoading: boolean } = useProfileByHandle(handle || '');
 
   if (isLoading) {
     return (

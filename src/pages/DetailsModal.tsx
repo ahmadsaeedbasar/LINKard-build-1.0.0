@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import { X, BadgeCheck, Tag } from 'lucide-react';
-import { Profile } from '../types/profile';
+import { X, BadgeCheck } from 'lucide-react'; // Removed Tag
+import type { Profile } from '../types/profile';
 
 interface DetailsModalProps {
   profile: Profile;
@@ -34,7 +34,7 @@ const DetailsModal: React.FC<DetailsModalProps> = ({ profile, isOpen, onClose })
     }
   };
 
-  const formatPrice = (price: number | null | undefined) => {
+  const formatPrice = (price: number | null | undefined) => { // Changed type to number | null | undefined
     if (price === null || price === undefined) {
       return 'N/A';
     }

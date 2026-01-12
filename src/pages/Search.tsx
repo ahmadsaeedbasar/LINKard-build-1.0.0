@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
@@ -10,7 +10,7 @@ import DetailsModal from '@/components/DetailsModal';
 import Footer from '@/components/Footer';
 import { useProfilesData } from '@/hooks/useProfilesData';
 import { Loader2 } from 'lucide-react';
-import { Profile } from '@/types/profile'; // Import Profile type
+import type { Profile } from '@/types/profile'; // Import Profile type
 
 const Search = () => {
   const [searchParams] = useSearchParams();
