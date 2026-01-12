@@ -8,14 +8,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [usernameOrEmail, setUsernameOrEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const updateButtonState = () => {
     let reason = '';
-    if (!email.trim()) reason = 'Enter email';
+    if (!usernameOrEmail.trim()) reason = 'Enter username/email';
     else if (!password) reason = 'Enter password';
     return reason;
   };
@@ -31,8 +31,25 @@ const Login = () => {
 
     setIsLoading(true);
 
+    let emailToUse = usernameOrEmail;
+    if (!usernameOrEmail.includes('@')) {
+      // It's a username, lookup the email
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('username', usernameOrEmail.toLowerCase())
+        .maybeSingle();
+
+      if (profileError || !profile) {
+        showError('Username not found');
+        setIsLoading(false);
+        return;
+      }
+      emailToUse = profile.email;
+    }
+
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
+      email: emailToUse,
       password,
     });
 
@@ -80,15 +97,15 @@ const Login = () => {
           
           <form onSubmit={handleSubmit} className="space-y-4 bg-white border rounded-lg p-5">
             <div>
-              <label htmlFor="login_email" className="block text-sm text-gray-700 mb-1">Email</label>
+              <label htmlFor="login_user" className="block text-sm text-gray-700 mb-1">Username or Email</label>
               <input
-                id="login_email"
-                name="email"
-                type="email"
+                id="login_user"
+                name="username"
+                type="text"
                 className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-black focus:border-transparent"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                value={usernameOrEmail}
+                onChange={(e) => setUsernameOrEmail(e.target.value)}
               />
             </div>
             <div>

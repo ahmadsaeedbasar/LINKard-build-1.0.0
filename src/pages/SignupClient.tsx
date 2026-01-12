@@ -253,6 +253,7 @@ const SignupClient = () => {
         id: authData.user.id,
         username: formData.username.toLowerCase(),
         display_name: formData.displayName,
+        email: formData.email,
         role: 'client',
         bio: formData.bio,
       });
