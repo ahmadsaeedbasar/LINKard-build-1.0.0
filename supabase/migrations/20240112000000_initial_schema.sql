@@ -24,8 +24,8 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Create user_management.profiles table
-CREATE TABLE user_management.profiles (
+-- Create profiles table
+CREATE TABLE profiles (
     id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
     username TEXT UNIQUE NOT NULL,
     display_name TEXT,
@@ -50,15 +50,15 @@ CREATE TABLE user_management.profiles (
 );
 
 -- Add constraints and indexes to profiles
-ALTER TABLE user_management.profiles ADD CONSTRAINT profiles_email_check CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
-CREATE INDEX idx_profiles_username ON user_management.profiles (username);
-CREATE INDEX idx_profiles_role ON user_management.profiles (role);
-CREATE INDEX idx_profiles_email ON user_management.profiles (email);
+ALTER TABLE profiles ADD CONSTRAINT profiles_email_check CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$');
+CREATE INDEX idx_profiles_username ON profiles (username);
+CREATE INDEX idx_profiles_role ON profiles (role);
+CREATE INDEX idx_profiles_email ON profiles (email);
 
 -- Create content_management.portfolio_items table
 CREATE TABLE content_management.portfolio_items (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    profile_id UUID REFERENCES user_management.profiles(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
     title TEXT NOT NULL,
     type TEXT NOT NULL CHECK (type IN ('video', 'image')),
     thumbnail TEXT,
@@ -74,8 +74,8 @@ CREATE INDEX idx_portfolio_items_type ON content_management.portfolio_items (typ
 -- Create interaction_management.inquiries table
 CREATE TABLE interaction_management.inquiries (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    creator_id UUID REFERENCES user_management.profiles(id) ON DELETE CASCADE,
-    sender_id UUID REFERENCES user_management.profiles(id) ON DELETE CASCADE,
+    creator_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+    sender_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
     brand_name TEXT NOT NULL,
     message TEXT NOT NULL,
     status TEXT DEFAULT 'unread' CHECK (status IN ('unread', 'read', 'responded')),
@@ -93,7 +93,7 @@ CREATE INDEX idx_inquiries_created_at ON interaction_management.inquiries (creat
 -- Create analytics_management.analytics_events table
 CREATE TABLE analytics_management.analytics_events (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    profile_id UUID REFERENCES user_management.profiles(id) ON DELETE CASCADE,
+    profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
     event_type TEXT NOT NULL,
     event_data JSONB DEFAULT '{}',
     ip_address INET,
@@ -114,16 +114,16 @@ CREATE TABLE system_management.system_settings (
 );
 
 -- Enable RLS on all tables
-ALTER TABLE user_management.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE content_management.portfolio_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE interaction_management.inquiries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics_management.analytics_events ENABLE ROW LEVEL SECURITY;
 ALTER TABLE system_management.system_settings ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for profiles
-CREATE POLICY "Users can view all profiles" ON user_management.profiles FOR SELECT USING (true);
-CREATE POLICY "Users can update own profile" ON user_management.profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Users can insert own profile" ON user_management.profiles FOR INSERT WITH CHECK (auth.uid() = id);
+CREATE POLICY "Users can view all profiles" ON profiles FOR SELECT USING (true);
+CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
+CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
 -- RLS Policies for portfolio_items
 CREATE POLICY "Users can view portfolio items" ON content_management.portfolio_items FOR SELECT USING (true);
@@ -143,6 +143,6 @@ CREATE POLICY "Users can insert own analytics" ON analytics_management.analytics
 CREATE POLICY "Authenticated users can read system settings" ON system_management.system_settings FOR SELECT USING (auth.role() = 'authenticated');
 
 -- Add triggers for updated_at
-CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON user_management.profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+CREATE TRIGGER update_profiles_updated_at BEFORE UPDATE ON profiles FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_portfolio_items_updated_at BEFORE UPDATE ON content_management.portfolio_items FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 CREATE TRIGGER update_inquiries_updated_at BEFORE UPDATE ON interaction_management.inquiries FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
