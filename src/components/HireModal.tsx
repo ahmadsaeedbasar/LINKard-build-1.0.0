@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { X, Send } from 'lucide-react';
 import { showSuccess } from '@/utils/toast';
-import { useInquiries } from '@/context/InquiryContext';
+import { useInquiries } from '@/hooks/useInquiries';
 import { useAuth } from '@/context/AuthContext';
 
 interface HireModalProps {

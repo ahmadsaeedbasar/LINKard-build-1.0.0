@@ -23,7 +23,7 @@ interface InquiryContextType {
   fetchInquiries: () => Promise<void>;
 }
 
-const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
+export const InquiryContext = createContext<InquiryContextType | undefined>(undefined);
 
 export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [receivedInquiries, setReceivedInquiries] = useState<Inquiry[]>([]);
@@ -97,10 +97,4 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
       {children}
     </InquiryContext.Provider>
   );
-};
-
-export const useInquiries = () => {
-  const context = useContext(InquiryContext);
-  if (context === undefined) throw new Error('useInquiries must be used within an InquiryProvider');
-  return context;
 };
