@@ -45,6 +45,11 @@ const Login = () => {
         setIsLoading(false);
         return;
       }
+      if (!profile.email) {
+        showError('Please login with your email address');
+        setIsLoading(false);
+        return;
+      }
       emailToUse = profile.email;
     }
 
