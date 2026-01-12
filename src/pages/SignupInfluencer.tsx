@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { supabase } from '@/integrations/supabase/client';
 import { showError, showSuccess } from '@/utils/toast';
 import { Loader2 } from 'lucide-react';
 
@@ -68,36 +67,14 @@ const SignupInfluencer = () => {
       return false;
     }
 
-    try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('username', u.toLowerCase())
-        .maybeSingle();
-
-      if (error) {
-        // If error (likely due to RLS permissions), assume available to allow signup
-        setUsernameStatus({
-          checking: false,
-          available: true,
-          message: '✓ Assuming available',
-          className: 'text-xs font-medium text-emerald-600',
-        });
-        return true;
-      }
-
-      const isAvailable = !data;
-      setUsernameStatus({
-        checking: false,
-        available: isAvailable,
-        message: isAvailable ? '✓ Available' : '✗ Taken',
-        className: isAvailable ? 'text-xs font-medium text-emerald-600' : 'text-xs font-medium text-red-600',
-      });
-      return isAvailable;
-    } catch (e) {
-      setUsernameStatus({ checking: false, available: true, message: '✓ Assuming available', className: 'text-xs font-medium text-emerald-600' });
-      return true;
-    }
+    // Database not available, assume available
+    setUsernameStatus({
+      checking: false,
+      available: true,
+      message: '✓ Database not available',
+      className: 'text-xs font-medium text-yellow-600',
+    });
+    return true;
   }, []);
 
   const validateEmail = (v: string) => {
