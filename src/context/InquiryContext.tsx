@@ -39,7 +39,7 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Fetch inquiries received (as an influencer)
     const { data: received, error: receivedError } = await supabase
-      .from('inquiries')
+      .from('interaction_management.inquiries')
       .select('*')
       .eq('creator_id', user.id)
       .order('created_at', { ascending: false });
@@ -48,7 +48,7 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Fetch inquiries sent (as a brand/client)
     const { data: sent, error: sentError } = await supabase
-      .from('inquiries')
+      .from('interaction_management.inquiries')
       .select('*')
       .eq('sender_id', user.id)
       .order('created_at', { ascending: false });
@@ -60,12 +60,12 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
     if (!user) throw new Error("Must be logged in to send inquiry");
     
     const { error } = await supabase
-      .from('inquiries')
+      .from('interaction_management.inquiries')
       .insert([
-        { 
-          creator_id: creatorId, 
-          brand_name: brandName, 
-          message, 
+        {
+          creator_id: creatorId,
+          brand_name: brandName,
+          message,
           sender_id: user.id,
           sender_name: brandName
         }
@@ -77,7 +77,7 @@ export const InquiryProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const markAsRead = async (id: string) => {
     const { error } = await supabase
-      .from('inquiries')
+      .from('interaction_management.inquiries')
       .update({ status: 'read' })
       .eq('id', id);
     

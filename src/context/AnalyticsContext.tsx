@@ -3,7 +3,7 @@
 import React, { createContext } from 'react';
 
 export interface AnalyticsContextType {
-  sendEvent: (endpoint: string, payload: Record<string, any>) => void;
+  sendEvent: (endpoint: string, payload: Record<string, unknown>) => void;
 }
 
 const AnalyticsContext = createContext<AnalyticsContextType | undefined>(undefined);

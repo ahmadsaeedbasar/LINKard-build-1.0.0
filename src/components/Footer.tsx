@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { useAnalytics } from '@/hooks/useAnalytics';
+import { useAnalytics } from '../hooks/useAnalytics';
 
 const Footer = () => {
   const { sendEvent } = useAnalytics();

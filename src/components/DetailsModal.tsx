@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import { X, BadgeCheck, Tag } from 'lucide-react';
-import { Profile } from '@/types/profile';
+import { Profile } from '../types/profile';
 
 interface DetailsModalProps {
   profile: Profile;

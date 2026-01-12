@@ -70,7 +70,7 @@ const SignupInfluencer = () => {
 
     try {
       const { data, error } = await supabase
-        .from('profiles')
+        .from('user_management.profiles')
         .select('username')
         .eq('username', u.toLowerCase())
         .maybeSingle();
@@ -248,7 +248,7 @@ const SignupInfluencer = () => {
 
     // Insert profile data
     const { error: profileError } = await supabase
-      .from('profiles')
+      .from('user_management.profiles')
       .insert({
         id: authData.user.id,
         username: formData.username.toLowerCase(),
@@ -294,7 +294,7 @@ const SignupInfluencer = () => {
 
         // Update the profile with the avatar URL
         const { error: updateProfileError } = await supabase
-          .from('profiles')
+          .from('user_management.profiles')
           .update({ avatar_url: avatarUrl })
           .eq('id', authData.user.id);
 

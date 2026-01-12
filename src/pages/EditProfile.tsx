@@ -40,7 +40,7 @@ const EditProfile = () => {
     
     setIsSaving(true);
     const { error } = await supabase
-      .from('profiles')
+      .from('user_management.profiles')
       .update({
         display_name: formData.displayName,
         bio: formData.bio,

@@ -96,7 +96,7 @@ const Header = () => {
                 </Link>
                 <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
                   <UserIcon className="w-4 h-4" />
-                  {profile?.display_name || user?.email}
+                  {(profile?.display_name as string) || user?.email}
                 </div>
                 <button
                   onClick={handleLogout}

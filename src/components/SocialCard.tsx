@@ -3,8 +3,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { BadgeCheck, MapPin, ExternalLink, Tag } from 'lucide-react'; // Added Tag icon
-import { useAnalytics } from '@/hooks/useAnalytics';
-import { Profile } from '@/types/profile'; // Updated import
+import { useAnalytics } from '../hooks/useAnalytics';
+import { Profile } from '../types/profile'; // Updated import
 
 interface SocialCardProps {
   profile: Profile; // Updated type

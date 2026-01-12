@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useRef } from 'react';
-import AnalyticsContext, { AnalyticsContextType } from '@/context/AnalyticsContext';
+import AnalyticsContext, { AnalyticsContextType } from '../context/AnalyticsContext';
 
 const getSessionId = () => {
   let sid = sessionStorage.getItem('analytics_sid');

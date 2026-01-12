@@ -35,7 +35,7 @@ const Login = () => {
     if (!usernameOrEmail.includes('@')) {
       // It's a username, lookup the email
       const { data: profile, error: profileError } = await supabase
-        .from('profiles')
+        .from('user_management.profiles')
         .select('email')
         .eq('username', usernameOrEmail.toLowerCase())
         .maybeSingle();
@@ -64,7 +64,7 @@ const Login = () => {
     } else {
       showSuccess("Welcome back!");
       const { data: profile } = await supabase
-        .from('profiles')
+        .from('user_management.profiles')
         .select('role')
         .eq('id', data.user?.id)
         .single();
