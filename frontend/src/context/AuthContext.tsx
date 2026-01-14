@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const fetchProfile = async (userId: string) => {
     // Get profile data
     const { data: profileData, error: profileError } = await supabase
-      .from('profiles')
+      .from('user_management.profiles')
       .select('*')
       .eq('id', userId)
       .single();
@@ -58,7 +58,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Get portfolio items
     const { data: portfolioItems, error: portfolioError } = await supabase
-      .from('portfolio_items')
+      .from('user_management.portfolio_items')
       .select('title, type, thumbnail_url, content_url')
       .eq('profile_id', userId)
       .order('created_at', { ascending: true });

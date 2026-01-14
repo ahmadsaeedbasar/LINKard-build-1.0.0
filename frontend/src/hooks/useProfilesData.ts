@@ -9,7 +9,7 @@ export const useProfilesData = (searchQuery?: string, platform?: string) => {
     queryKey: ['profiles', searchQuery, platform],
     queryFn: async () => {
       let query = supabase
-        .from('profiles') // Changed to public.profiles
+        .from('user_management.profiles')
         .select('*')
         .eq('role', 'influencer');
 
@@ -33,12 +33,12 @@ export const useFeaturedProfiles = () => {
     queryKey: ['featured-profiles'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('profiles') // Changed to public.profiles
+        .from('user_management.profiles')
         .select('*')
         .eq('role', 'influencer')
         .eq('is_featured', true)
         .limit(6);
-      
+
       if (error) throw error;
       return data as Profile[];
     }
@@ -54,7 +54,7 @@ export const useProfileByHandle = (handle: string) => {
 
       // Get profile data
       const { data: profile, error: profileError } = await supabase
-        .from('profiles')
+        .from('user_management.profiles')
         .select('*')
         .eq('username', username)
         .single();
@@ -63,7 +63,7 @@ export const useProfileByHandle = (handle: string) => {
 
       // Get portfolio items
       const { data: portfolioItems, error: portfolioError } = await supabase
-        .from('portfolio_items')
+        .from('user_management.portfolio_items')
         .select('title, type, thumbnail_url, content_url')
         .eq('profile_id', profile.id)
         .order('created_at', { ascending: true });
