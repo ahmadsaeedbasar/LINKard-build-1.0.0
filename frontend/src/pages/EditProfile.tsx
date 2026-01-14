@@ -7,7 +7,8 @@ import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { showSuccess, showError } from '@/utils/toast';
-import { Save, ChevronLeft, Loader2 } from 'lucide-react';
+import { Save, ChevronLeft, Loader2, Plus, Trash2 } from 'lucide-react';
+import { PortfolioItem } from '@/types/profile';
 
 const EditProfile = () => {
   const { user, profile } = useAuth();
@@ -20,6 +21,7 @@ const EditProfile = () => {
     category: 'Lifestyle',
     location: '',
     startPrice: '', // Keep as string for input, convert to number for DB
+    portfolioItems: [] as PortfolioItem[],
   });
 
   useEffect(() => {
@@ -30,6 +32,7 @@ const EditProfile = () => {
         category: profile.category || 'Lifestyle',
         location: profile.location || '',
         startPrice: profile.start_price !== null && profile.start_price !== undefined ? profile.start_price.toString() : '',
+        portfolioItems: profile.portfolio_items || [],
       });
     }
   }, [profile]);
@@ -47,8 +50,9 @@ const EditProfile = () => {
       return;
     }
 
-    const { error } = await supabase
-      .from('profiles') // Changed to public.profiles
+    // Update profile (remove portfolio_items as it's now in separate table)
+    const { error: profileError } = await supabase
+      .from('profiles')
       .update({
         display_name: formData.displayName,
         bio: formData.bio,
@@ -59,14 +63,50 @@ const EditProfile = () => {
       })
       .eq('id', user.id);
 
-    setIsSaving(false);
-    
-    if (error) {
-      showError(error.message);
-    } else {
-      showSuccess("Profile updated successfully!");
-      navigate('/dashboard');
+    if (profileError) {
+      showError(profileError.message);
+      setIsSaving(false);
+      return;
     }
+
+    // Handle portfolio items separately
+    // First, delete existing portfolio items for this user
+    const { error: deleteError } = await supabase
+      .from('portfolio_items')
+      .delete()
+      .eq('profile_id', user.id);
+
+    if (deleteError) {
+      showError('Failed to update portfolio: ' + deleteError.message);
+      setIsSaving(false);
+      return;
+    }
+
+    // Insert new portfolio items
+    if (formData.portfolioItems.length > 0) {
+      const { error: insertError } = await supabase
+        .from('portfolio_items')
+        .insert(
+          formData.portfolioItems.map(item => ({
+            profile_id: user.id,
+            title: item.title,
+            type: item.type,
+            thumbnail_url: item.thumbnail,
+            content_url: item.url,
+            description: item.description || null,
+          }))
+        );
+
+      if (insertError) {
+        showError('Failed to save portfolio items: ' + insertError.message);
+        setIsSaving(false);
+        return;
+      }
+    }
+
+    setIsSaving(false);
+    showSuccess("Profile updated successfully!");
+    navigate('/dashboard');
   };
 
   return (
@@ -145,6 +185,91 @@ const EditProfile = () => {
                   value={formData.startPrice}
                   onChange={(e) => setFormData({...formData, startPrice: e.target.value})}
                 />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-4">Portfolio Items</label>
+              <div className="space-y-4">
+                {formData.portfolioItems.map((item, index) => (
+                  <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="flex-1">
+                      <div className="font-semibold">{item.title}</div>
+                      <div className="text-sm text-gray-500">{item.type} • {item.url}</div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({
+                        ...formData,
+                        portfolioItems: formData.portfolioItems.filter((_, i) => i !== index)
+                      })}
+                      className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+                <div className="border-t pt-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input
+                      type="text"
+                      placeholder="Title"
+                      className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
+                      id="new-portfolio-title"
+                    />
+                    <select
+                      className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
+                      id="new-portfolio-type"
+                    >
+                      <option value="image">Image</option>
+                      <option value="video">Video</option>
+                    </select>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <input
+                      type="url"
+                      placeholder="Thumbnail URL"
+                      className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
+                      id="new-portfolio-thumbnail"
+                    />
+                    <input
+                      type="url"
+                      placeholder="Content URL"
+                      className="px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none"
+                      id="new-portfolio-url"
+                    />
+                  </div>
+                  <div className="mb-4">
+                    <textarea
+                      placeholder="Description (optional)"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-black outline-none h-20 resize-none"
+                      id="new-portfolio-description"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const title = (document.getElementById('new-portfolio-title') as HTMLInputElement).value;
+                      const type = (document.getElementById('new-portfolio-type') as HTMLSelectElement).value as 'video' | 'image';
+                      const thumbnail = (document.getElementById('new-portfolio-thumbnail') as HTMLInputElement).value;
+                      const url = (document.getElementById('new-portfolio-url') as HTMLInputElement).value;
+                      if (title && type && thumbnail && url) {
+                        setFormData({
+                          ...formData,
+                          portfolioItems: [...formData.portfolioItems, { title, type, thumbnail, url }]
+                        });
+                        (document.getElementById('new-portfolio-title') as HTMLInputElement).value = '';
+                        (document.getElementById('new-portfolio-type') as HTMLSelectElement).value = 'image';
+                        (document.getElementById('new-portfolio-thumbnail') as HTMLInputElement).value = '';
+                        (document.getElementById('new-portfolio-url') as HTMLInputElement).value = '';
+                      }
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-colors"
+                  >
+                    <Plus size={16} />
+                    Add Item
+                  </button>
+                </div>
               </div>
             </div>
 

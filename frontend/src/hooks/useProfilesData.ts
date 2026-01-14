@@ -51,14 +51,30 @@ export const useProfileByHandle = (handle: string) => {
     queryFn: async () => {
       // Handle can be @username or username
       const username = handle.startsWith('@') ? handle.slice(1) : handle;
-      const { data, error } = await supabase
-        .from('profiles') // Changed to public.profiles
+
+      // Get profile data
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
         .select('*')
         .eq('username', username)
         .single();
-      
-      if (error) throw error;
-      return data as Profile;
+
+      if (profileError) throw profileError;
+
+      // Get portfolio items
+      const { data: portfolioItems, error: portfolioError } = await supabase
+        .from('portfolio_items')
+        .select('title, type, thumbnail_url, content_url')
+        .eq('profile_id', profile.id)
+        .order('created_at', { ascending: true });
+
+      if (portfolioError) throw portfolioError;
+
+      // Combine profile with portfolio items
+      return {
+        ...profile,
+        portfolio_items: portfolioItems || []
+      } as Profile;
     },
     enabled: !!handle
   });

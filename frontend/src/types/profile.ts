@@ -3,6 +3,7 @@ export interface PortfolioItem {
   type: 'video' | 'image';
   thumbnail: string;
   url: string;
+  description?: string;
 }
 
 export interface Profile {

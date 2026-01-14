@@ -47,13 +47,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const fetchProfile = async (userId: string) => {
-    const { data, error } = await supabase
-      .from('profiles') // Changed to public.profiles
+    // Get profile data
+    const { data: profileData, error: profileError } = await supabase
+      .from('profiles')
       .select('*')
       .eq('id', userId)
       .single();
 
-    if (!error) setProfile(data as Profile); // Cast data to Profile
+    if (profileError) return;
+
+    // Get portfolio items
+    const { data: portfolioItems, error: portfolioError } = await supabase
+      .from('portfolio_items')
+      .select('title, type, thumbnail_url, content_url')
+      .eq('profile_id', userId)
+      .order('created_at', { ascending: true });
+
+    // Combine profile with portfolio items
+    const completeProfile = {
+      ...profileData,
+      portfolio_items: portfolioError ? [] : (portfolioItems || [])
+    };
+
+    setProfile(completeProfile as Profile);
   };
 
   const logout = async () => {
