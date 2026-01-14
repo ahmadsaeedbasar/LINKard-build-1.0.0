@@ -1,28 +1,14 @@
 {
-  "name": "linkard-monorepo",
+  "name": "@linkard/frontend",
   "private": true,
   "version": "1.0.0",
-  "description": "LINKard - Professional influencer-client connection platform",
-  "workspaces": [
-    "frontend",
-    "packages/*"
-  ],
+  "type": "module",
   "scripts": {
-    "dev": "pnpm --filter @linkard/frontend dev",
-    "build": "pnpm --filter @linkard/frontend build",
-    "build:dev": "pnpm --filter @linkard/frontend build:dev",
-    "lint": "pnpm --filter @linkard/frontend lint",
-    "preview": "pnpm --filter @linkard/frontend preview",
-    "deploy": "pnpm build && npx wrangler pages deploy frontend/dist",
-    "install:all": "pnpm install",
-    "clean": "pnpm -r exec rm -rf node_modules dist",
-    "supabase:start": "npx supabase start",
-    "supabase:stop": "npx supabase stop",
-    "supabase:reset": "npx supabase db reset",
-    "supabase:studio": "npx supabase studio",
-    "supabase:link": "npx supabase link",
-    "supabase:push": "npx supabase db push",
-    "types:build": "pnpm --filter @linkard/types build"
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -89,11 +75,9 @@
     "eslint-plugin-react-refresh": "^0.4.9",
     "globals": "^15.9.0",
     "postcss": "^8.4.47",
-    "supabase": "^2.72.4",
     "tailwindcss": "^3.4.11",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.0.1",
-    "vite": "^6.3.4",
-    "wrangler": "^4.58.0"
+    "vite": "^6.3.4"
   }
 }
